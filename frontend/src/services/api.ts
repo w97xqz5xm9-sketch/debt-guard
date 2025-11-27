@@ -54,7 +54,7 @@ export const budgetApi = {
     return response.data
   },
 
-  useUnlock: async (): Promise<{ success: boolean; unlocksRemaining: number; message: string }> => {
+  useUnlock: async (): Promise<{ success: boolean; unlocksRemaining: number; message: string; requiresAccessCode?: boolean }> => {
     const response = await api.post('/unlock/use')
     return response.data
   },
