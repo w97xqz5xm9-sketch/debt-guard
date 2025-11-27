@@ -6,7 +6,7 @@ import Settings from './pages/Settings'
 import Setup from './pages/Setup'
 import Explanation from './pages/Explanation'
 import Layout from './components/Layout'
-import axios from 'axios'
+import { budgetApi } from './services/api'
 
 function App() {
   const [needsSetup, setNeedsSetup] = useState<boolean | null>(null)
@@ -17,8 +17,8 @@ function App() {
 
   const checkSetup = async () => {
     try {
-      const response = await axios.get('/api/setup')
-      setNeedsSetup(response.data.needsSetup)
+      const response = await budgetApi.getSetup()
+      setNeedsSetup(response.needsSetup)
     } catch (error) {
       console.error('Error checking setup:', error)
       setNeedsSetup(true)

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Target, TrendingUp, Shield, PiggyBank, Gem, Crown } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
-import axios from 'axios'
+import { budgetApi } from '../services/api'
 
 interface SetupProps {
   onComplete?: () => void
@@ -47,11 +47,11 @@ export default function Setup({ onComplete }: SetupProps) {
 
   const loadCurrentSetup = async () => {
     try {
-      const response = await axios.get('/api/setup')
-      if (!response.data.needsSetup && response.data.setup) {
-        setCurrentSetup(response.data.setup)
-        setSavingsGoal(response.data.setup.savingsGoal)
-        setMonthlyIncome(response.data.setup.monthlyIncome.toString())
+      const response = await budgetApi.getSetup()
+      if (!response.needsSetup && response.setup) {
+        setCurrentSetup(response.setup)
+        setSavingsGoal(response.setup.savingsGoal)
+        setMonthlyIncome(response.setup.monthlyIncome.toString())
       }
     } catch (error) {
       console.error('Error loading current setup:', error)
@@ -63,11 +63,11 @@ export default function Setup({ onComplete }: SetupProps) {
 
     setLoading(true)
     try {
-      const response = await axios.post('/api/setup', {
+      const response = await budgetApi.saveSetup({
         savingsGoal,
         monthlyIncome: parseFloat(monthlyIncome) || 3000,
       })
-      console.log('Setup created:', response.data)
+      console.log('Setup created:', response)
       if (onComplete) {
         onComplete()
       }
@@ -164,7 +164,7 @@ export default function Setup({ onComplete }: SetupProps) {
         <button
           onClick={async () => {
             try {
-              await axios.delete('/api/setup')
+              await budgetApi.resetSetup()
               window.location.reload()
             } catch (error) {
               console.error('Error:', error)

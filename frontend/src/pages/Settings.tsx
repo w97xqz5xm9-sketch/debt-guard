@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import { CreditCard, Bell, Lock, Unlock } from 'lucide-react'
 import { budgetApi } from '../services/api'
-import axios from 'axios'
 import type { Account, SpendingBehavior } from '../types'
 
 function UnlockSystem() {
@@ -16,8 +15,8 @@ function UnlockSystem() {
 
   const loadUnlockStatus = async () => {
     try {
-      const response = await axios.get('/api/unlock')
-      setUnlocksRemaining(response.data.unlocksRemaining)
+      const response = await budgetApi.getUnlockStatus()
+      setUnlocksRemaining(response.unlocksRemaining)
     } catch (error) {
       console.error('Error loading unlock status:', error)
     }
@@ -31,12 +30,12 @@ function UnlockSystem() {
 
     setLoading(true)
     try {
-      const response = await axios.post('/api/unlock/use')
-      setUnlocksRemaining(response.data.unlocksRemaining)
-      if (response.data.requiresAccessCode) {
+      const response = await budgetApi.useUnlock()
+      setUnlocksRemaining(response.unlocksRemaining)
+      if (response.requiresAccessCode) {
         setShowAccessCodeInput(true)
       }
-      alert(response.data.message)
+      alert(response.message)
     } catch (error: any) {
       alert(error.response?.data?.message || 'Fehler beim Verwenden der Entsperrung')
       if (error.response?.status === 403) {
@@ -50,11 +49,11 @@ function UnlockSystem() {
   const handleResetUnlocks = async () => {
     setLoading(true)
     try {
-      const response = await axios.post('/api/unlock/reset', { accessCode })
-      setUnlocksRemaining(response.data.unlocksRemaining)
+      const response = await budgetApi.resetUnlocks(accessCode)
+      setUnlocksRemaining(response.unlocksRemaining)
       setShowAccessCodeInput(false)
       setAccessCode('')
-      alert(response.data.message)
+      alert(response.message)
     } catch (error: any) {
       alert(error.response?.data?.message || 'Ungültiger Zugangscode')
     } finally {

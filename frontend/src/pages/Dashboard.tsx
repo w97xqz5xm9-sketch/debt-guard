@@ -43,7 +43,7 @@ export default function Dashboard() {
         <button
           onClick={async () => {
             try {
-              await fetch('/api/setup', { method: 'DELETE' })
+              await budgetApi.resetSetup()
               window.location.reload()
             } catch (error) {
               console.error('Error resetting setup:', error)

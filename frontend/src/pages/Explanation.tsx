@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Info, TrendingDown, AlertCircle, CheckCircle } from 'lucide-react'
-import axios from 'axios'
+import { budgetApi } from '../services/api'
 
 interface ExplanationData {
   error?: string
@@ -30,8 +30,8 @@ export default function Explanation() {
 
   const loadExplanation = async () => {
     try {
-      const response = await axios.get('/api/explanation')
-      setData(response.data)
+      const data = await budgetApi.getExplanation()
+      setData(data)
     } catch (error) {
       console.error('Error loading explanation:', error)
     } finally {

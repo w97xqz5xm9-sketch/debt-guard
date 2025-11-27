@@ -24,8 +24,8 @@ export const budgetApi = {
     return response.data
   },
 
-  addTransaction: async (transaction: Omit<Transaction, 'id' | 'date'>): Promise<Transaction> => {
-    const response = await api.post<Transaction>('/transactions', transaction)
+  addTransaction: async (transaction: Omit<Transaction, 'id' | 'date'> & { useUnlock?: boolean }): Promise<Transaction & { unlockUsed?: boolean; message?: string }> => {
+    const response = await api.post<Transaction & { unlockUsed?: boolean; message?: string }>('/transactions', transaction)
     return response.data
   },
 
@@ -67,6 +67,20 @@ export const budgetApi = {
   getExplanation: async (): Promise<any> => {
     const response = await api.get('/explanation')
     return response.data
+  },
+
+  getSetup: async (): Promise<any> => {
+    const response = await api.get('/setup')
+    return response.data
+  },
+
+  saveSetup: async (setup: any): Promise<any> => {
+    const response = await api.post('/setup', setup)
+    return response.data
+  },
+
+  resetSetup: async (): Promise<void> => {
+    await api.delete('/setup')
   },
 }
 

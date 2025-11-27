@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Plus, CheckCircle, XCircle, Unlock } from 'lucide-react'
 import { budgetApi } from '../services/api'
-import axios from 'axios'
 import type { BudgetCalculation } from '../types'
 
 export default function Budget() {
@@ -18,8 +17,8 @@ export default function Budget() {
 
   const loadUnlockStatus = async () => {
     try {
-      const response = await axios.get('/api/unlock')
-      setUnlocksRemaining(response.data.unlocksRemaining)
+      const response = await budgetApi.getUnlockStatus()
+      setUnlocksRemaining(response.unlocksRemaining)
     } catch (error) {
       console.error('Error loading unlock status:', error)
     }
@@ -57,7 +56,7 @@ export default function Budget() {
     if (isNaN(amount) || amount <= 0) return
 
     try {
-      const response = await axios.post('/api/transactions', {
+      const response = await budgetApi.addTransaction({
         amount,
         description: newTransaction.description,
         category: newTransaction.category,
@@ -65,8 +64,8 @@ export default function Budget() {
         useUnlock,
       })
       
-      if (response.data.unlockUsed) {
-        alert(`✅ Transaktion mit Entsperrung durchgeführt!\n${response.data.message}\nNoch ${unlocksRemaining - 1} Entsperrungen verfügbar.`)
+      if (response.unlockUsed) {
+        alert(`✅ Transaktion mit Entsperrung durchgeführt!\n${response.message}\nNoch ${unlocksRemaining - 1} Entsperrungen verfügbar.`)
         loadUnlockStatus()
       }
       
