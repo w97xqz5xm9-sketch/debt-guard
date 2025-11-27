@@ -1,10 +1,10 @@
-import express from 'express'
+import express, { Request, Response } from 'express'
 import { getUnlockStatus, useUnlock, resetUnlocks } from '../services/unlockService'
 
 const router = express.Router()
 
 // Get unlock status
-router.get('/', async (req, res) => {
+router.get('/', async (req: Request, res: Response) => {
   try {
     const status = getUnlockStatus()
     res.json(status)
@@ -15,7 +15,7 @@ router.get('/', async (req, res) => {
 })
 
 // Use an unlock
-router.post('/use', async (req, res) => {
+router.post('/use', async (req: Request, res: Response) => {
   try {
     const result = useUnlock()
     if (result.success) {
@@ -39,7 +39,7 @@ router.post('/use', async (req, res) => {
 })
 
 // Reset unlocks with access code
-router.post('/reset', async (req, res) => {
+router.post('/reset', async (req: Request, res: Response) => {
   try {
     const { accessCode } = req.body
     const success = resetUnlocks(accessCode)
