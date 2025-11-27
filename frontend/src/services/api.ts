@@ -1,0 +1,74 @@
+import axios from 'axios'
+import type { Budget, Transaction, Account, SavingsGoal, BudgetCalculation, SpendingBehavior } from '../types'
+
+const api = axios.create({
+  baseURL: import.meta.env.VITE_API_URL || '/api',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+})
+
+export const budgetApi = {
+  getCurrentBudget: async (): Promise<Budget> => {
+    const response = await api.get<Budget>('/budget/current')
+    return response.data
+  },
+
+  calculateBudget: async (): Promise<BudgetCalculation> => {
+    const response = await api.get<BudgetCalculation>('/budget/calculate')
+    return response.data
+  },
+
+  getTransactions: async (): Promise<Transaction[]> => {
+    const response = await api.get<Transaction[]>('/transactions')
+    return response.data
+  },
+
+  addTransaction: async (transaction: Omit<Transaction, 'id' | 'date'>): Promise<Transaction> => {
+    const response = await api.post<Transaction>('/transactions', transaction)
+    return response.data
+  },
+
+  checkTransaction: async (amount: number, description: string): Promise<{ allowed: boolean; warning?: string; blockReason?: string }> => {
+    const response = await api.post('/transactions/check', { amount, description })
+    return response.data
+  },
+
+  getAccounts: async (): Promise<Account[]> => {
+    const response = await api.get<Account[]>('/accounts')
+    return response.data
+  },
+
+  getSavingsGoals: async (): Promise<SavingsGoal[]> => {
+    const response = await api.get<SavingsGoal[]>('/savings-goals')
+    return response.data
+  },
+
+  getSpendingBehavior: async (): Promise<SpendingBehavior> => {
+    const response = await api.get<SpendingBehavior>('/behavior')
+    return response.data
+  },
+
+  getUnlockStatus: async (): Promise<{ unlocksRemaining: number; totalUnlocks: number; requiresAccessCode: boolean }> => {
+    const response = await api.get('/unlock')
+    return response.data
+  },
+
+  useUnlock: async (): Promise<{ success: boolean; unlocksRemaining: number; message: string }> => {
+    const response = await api.post('/unlock/use')
+    return response.data
+  },
+
+  resetUnlocks: async (accessCode: string): Promise<{ success: boolean; unlocksRemaining: number; message: string }> => {
+    const response = await api.post('/unlock/reset', { accessCode })
+    return response.data
+  },
+
+  getExplanation: async (): Promise<any> => {
+    const response = await api.get('/explanation')
+    return response.data
+  },
+}
+
+export default api
+

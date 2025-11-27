@@ -1,0 +1,181 @@
+import { useState, useEffect } from 'react'
+import { Target, TrendingUp, Shield, PiggyBank, Gem, Crown } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
+import axios from 'axios'
+
+interface SetupProps {
+  onComplete?: () => void
+}
+
+type SavingsGoalAmount = 50 | 100 | 200 | 300 | 500 | 1000
+
+const goalOptions: { amount: SavingsGoalAmount; label: string; description: string }[] = [
+  { amount: 50, label: '50€ sparen', description: 'Leichter Einstieg ohne Druck' },
+  { amount: 100, label: '100€ sparen', description: 'Solide Balance aus Sparen & Budget' },
+  { amount: 200, label: '200€ sparen', description: 'Disziplinierter Modus mit mehr Polster' },
+  { amount: 300, label: '300€ sparen', description: 'Ambitioniert für klare Ziele' },
+  { amount: 500, label: '500€ sparen', description: 'Intensiv sparen für große Pläne' },
+  { amount: 1000, label: '1000€ sparen', description: 'Maximaler Fokus auf Vermögensaufbau' },
+]
+
+function GoalIcon({ amount }: { amount: SavingsGoalAmount }) {
+  const Icon = amount <= 100
+    ? Target
+    : amount <= 200
+      ? TrendingUp
+      : amount <= 300
+        ? Shield
+        : amount <= 500
+          ? PiggyBank
+          : amount < 1000
+            ? Gem
+            : Crown
+
+  return <Icon className="h-6 w-6 text-primary-600" />
+}
+
+export default function Setup({ onComplete }: SetupProps) {
+  const [savingsGoal, setSavingsGoal] = useState<SavingsGoalAmount | null>(null)
+  const [monthlyIncome, setMonthlyIncome] = useState('3000')
+  const [loading, setLoading] = useState(false)
+  const [currentSetup, setCurrentSetup] = useState<any>(null)
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    loadCurrentSetup()
+  }, [])
+
+  const loadCurrentSetup = async () => {
+    try {
+      const response = await axios.get('/api/setup')
+      if (!response.data.needsSetup && response.data.setup) {
+        setCurrentSetup(response.data.setup)
+        setSavingsGoal(response.data.setup.savingsGoal)
+        setMonthlyIncome(response.data.setup.monthlyIncome.toString())
+      }
+    } catch (error) {
+      console.error('Error loading current setup:', error)
+    }
+  }
+
+  const handleSubmit = async () => {
+    if (!savingsGoal) return
+
+    setLoading(true)
+    try {
+      const response = await axios.post('/api/setup', {
+        savingsGoal,
+        monthlyIncome: parseFloat(monthlyIncome) || 3000,
+      })
+      console.log('Setup created:', response.data)
+      if (onComplete) {
+        onComplete()
+      }
+      navigate('/')
+    } catch (error: any) {
+      console.error('Error creating setup:', error)
+      const errorMessage = error.response?.data?.error || 'Fehler beim Erstellen des Setups'
+      alert(errorMessage)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-primary-50 to-primary-100 flex items-center justify-center p-4">
+      <div className="max-w-md w-full">
+        <div className="card text-center">
+          <div className="mb-6">
+            <div className="bg-primary-600 p-4 rounded-full w-20 h-20 mx-auto mb-4 flex items-center justify-center">
+              <Shield className="h-10 w-10 text-white" />
+            </div>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">
+              {currentSetup ? 'Setup ändern' : 'Monats-Setup'}
+            </h1>
+            <p className="text-gray-600">
+              {currentSetup ? 'Ändere dein Sparziel oder Einkommen' : 'Wähle dein Sparziel für diesen Monat'}
+            </p>
+          </div>
+
+          <div className="space-y-4 mb-6">
+            {goalOptions.map(({ amount, label, description }) => (
+              <button
+                key={amount}
+                onClick={() => setSavingsGoal(amount)}
+                className={`w-full p-6 rounded-xl border-2 transition-all ${
+                  savingsGoal === amount
+                    ? 'border-primary-600 bg-primary-50 shadow-sm'
+                    : 'border-gray-200 hover:border-primary-300'
+                }`}
+              >
+                <div className="flex items-center justify-center space-x-3">
+                  <GoalIcon amount={amount} />
+                  <div className="text-left">
+                    <p className="font-semibold text-lg">{label}</p>
+                    <p className="text-sm text-gray-500">{description}</p>
+                  </div>
+                </div>
+              </button>
+            ))}
+          </div>
+
+          <div className="mb-6">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Monatliches Einkommen (optional)
+            </label>
+            <input
+              type="number"
+              value={monthlyIncome}
+              onChange={(e) => setMonthlyIncome(e.target.value)}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              placeholder="3000"
+            />
+            <p className="text-xs text-gray-500 mt-1">
+              Wird automatisch aus deinen Transaktionen erkannt, falls nicht angegeben
+            </p>
+          </div>
+
+          <button
+            onClick={handleSubmit}
+            disabled={!savingsGoal || loading}
+            className={`w-full py-3 text-lg font-medium rounded-lg transition-colors ${
+              !savingsGoal || loading
+                ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                : 'bg-primary-600 text-white hover:bg-primary-700'
+            }`}
+          >
+            {loading ? 'Wird erstellt...' : 'Setup starten'}
+          </button>
+          
+          {!savingsGoal && (
+            <p className="text-sm text-danger-600 mt-2 text-center">
+              Bitte wähle ein Sparziel aus
+            </p>
+          )}
+
+          <p className="text-xs text-gray-500 mt-4">
+            Die KI analysiert automatisch deine Fixkosten und berechnet dein Tageslimit
+          </p>
+        </div>
+      </div>
+      
+      {/* Debug: Reset button */}
+      <div className="mt-4 text-center">
+        <button
+          onClick={async () => {
+            try {
+              await axios.delete('/api/setup')
+              window.location.reload()
+            } catch (error) {
+              console.error('Error:', error)
+            }
+          }}
+          className="text-xs text-gray-500 hover:text-gray-700 underline"
+        >
+          Setup zurücksetzen (Debug)
+        </button>
+      </div>
+    </div>
+  )
+}
+
