@@ -22,6 +22,7 @@ router.post('/use', async (req: Request, res: Response) => {
       res.json({
         success: true,
         unlocksRemaining: result.unlocksRemaining,
+        requiresAccessCode: result.requiresAccessCode,
         message: result.requiresAccessCode
           ? 'Keine Entsperrungen mehr verfügbar. Bitte Zugangscode eingeben oder neuen kaufen.'
           : `Entsperrung verwendet. Noch ${result.unlocksRemaining} Entsperrungen verfügbar.`,
