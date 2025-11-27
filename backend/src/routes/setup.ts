@@ -67,9 +67,13 @@ router.post('/', async (req, res) => {
     setMonthlySetup(setup)
 
     res.json(setup)
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error creating setup:', error)
-    res.status(500).json({ error: 'Failed to create setup' })
+    const errorMessage = error?.message || 'Failed to create setup'
+    res.status(500).json({ 
+      error: errorMessage,
+      details: process.env.NODE_ENV === 'development' ? error?.stack : undefined
+    })
   }
 })
 

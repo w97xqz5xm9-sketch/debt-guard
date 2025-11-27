@@ -74,8 +74,20 @@ export default function Setup({ onComplete }: SetupProps) {
       navigate('/')
     } catch (error: any) {
       console.error('Error creating setup:', error)
-      const errorMessage = error.response?.data?.error || 'Fehler beim Erstellen des Setups'
-      alert(errorMessage)
+      let errorMessage = 'Fehler beim Erstellen des Setups'
+      
+      if (error.response) {
+        // Server responded with error
+        errorMessage = error.response.data?.error || `Server-Fehler: ${error.response.status}`
+      } else if (error.request) {
+        // Request made but no response
+        errorMessage = 'Keine Verbindung zum Backend. Bitte prüfe die Backend-URL in den Render-Einstellungen.'
+      } else {
+        errorMessage = error.message || errorMessage
+      }
+      
+      console.error('Full error:', error)
+      alert(`${errorMessage}\n\nBitte öffne die Browser-Konsole (F12) für mehr Details.`)
     } finally {
       setLoading(false)
     }

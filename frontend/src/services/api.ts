@@ -8,6 +8,25 @@ const api = axios.create({
   },
 })
 
+// Add error interceptor for better error messages
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response) {
+      // Server responded with error
+      console.error('API Error:', error.response.status, error.response.data)
+    } else if (error.request) {
+      // Request made but no response
+      console.error('Network Error:', error.request)
+      error.message = 'Keine Verbindung zum Server. Bitte prüfe, ob das Backend läuft.'
+    } else {
+      // Something else happened
+      console.error('Error:', error.message)
+    }
+    return Promise.reject(error)
+  }
+)
+
 export const budgetApi = {
   getCurrentBudget: async (): Promise<Budget> => {
     const response = await api.get<Budget>('/budget/current')
