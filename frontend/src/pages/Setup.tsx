@@ -39,6 +39,7 @@ export default function Setup({ onComplete }: SetupProps) {
   const [monthlyIncome, setMonthlyIncome] = useState('3000')
   const [loading, setLoading] = useState(false)
   const [currentSetup, setCurrentSetup] = useState<any>(null)
+  const [changeInfo, setChangeInfo] = useState<{ remaining: number; canChange: boolean } | null>(null)
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -52,12 +53,17 @@ export default function Setup({ onComplete }: SetupProps) {
         setCurrentSetup(response.setup)
         setSavingsGoal(response.setup.savingsGoal)
         setMonthlyIncome(response.setup.monthlyIncome.toString())
+        if (response.changeInfo) {
+          setChangeInfo(response.changeInfo)
+        }
       } else {
         setCurrentSetup(null)
+        setChangeInfo(null)
       }
     } catch (error) {
       console.error('Error loading current setup:', error)
       setCurrentSetup(null)
+      setChangeInfo(null)
     }
   }
 
@@ -66,10 +72,25 @@ export default function Setup({ onComplete }: SetupProps) {
 
     setLoading(true)
     try {
-      await budgetApi.saveSetup({
+      const response = await budgetApi.saveSetup({
         savingsGoal,
         monthlyIncome: parseFloat(monthlyIncome) || 3000,
       })
+      
+      // Show success message with remaining changes
+      if (currentSetup && response.changeInfo) {
+        const remaining = response.changeInfo.remaining
+        if (remaining > 0) {
+          alert(`✅ Setup erfolgreich geändert!\n\nDu hast noch ${remaining} Änderung${remaining !== 1 ? 'en' : ''} diesen Monat möglich.`)
+        } else {
+          alert('✅ Setup erfolgreich geändert!\n\nDu hast dein Limit von 3 Änderungen diesen Monat erreicht. Das Limit wird am 1. des nächsten Monats zurückgesetzt.')
+        }
+      } else if (!currentSetup) {
+        alert('✅ Setup erfolgreich erstellt!')
+      }
+      
+      // Reload setup info to get updated change info
+      await loadCurrentSetup()
       
       if (onComplete) {
         await onComplete()
@@ -86,6 +107,12 @@ export default function Setup({ onComplete }: SetupProps) {
       
       if (error.response) {
         errorMessage = error.response.data?.error || `Server-Fehler: ${error.response.status}`
+        if (error.response.data?.remaining !== undefined) {
+          const remaining = error.response.data.remaining
+          if (remaining === 0) {
+            errorMessage = 'Du hast bereits 3 Mal dein Sparziel diesen Monat geändert. Das Limit wird am 1. des nächsten Monats zurückgesetzt.'
+          }
+        }
       } else if (error.request) {
         errorMessage = 'Keine Verbindung zum Backend. Bitte prüfe die Backend-URL in den Render-Einstellungen.'
       } else {
@@ -112,6 +139,19 @@ export default function Setup({ onComplete }: SetupProps) {
             <p className="text-gray-600">
               {currentSetup ? 'Ändere dein Sparziel oder Einkommen' : 'Wähle dein Sparziel für diesen Monat'}
             </p>
+            {currentSetup && changeInfo && (
+              <div className="mt-2">
+                {changeInfo.canChange ? (
+                  <p className="text-sm text-gray-500">
+                    Noch {changeInfo.remaining} Änderung{changeInfo.remaining !== 1 ? 'en' : ''} diesen Monat möglich
+                  </p>
+                ) : (
+                  <p className="text-sm text-yellow-600">
+                    ⚠️ Limit erreicht: Du hast bereits 3 Mal dein Sparziel diesen Monat geändert. Das Limit wird am 1. des nächsten Monats zurückgesetzt.
+                  </p>
+                )}
+              </div>
+            )}
           </div>
 
           <div className="space-y-4 mb-6">
@@ -154,15 +194,29 @@ export default function Setup({ onComplete }: SetupProps) {
 
           <button
             onClick={handleSubmit}
-            disabled={!savingsGoal || loading}
+            disabled={!savingsGoal || loading || (changeInfo && !changeInfo.canChange)}
             className={`w-full py-3 text-lg font-medium rounded-lg transition-colors ${
-              !savingsGoal || loading
+              !savingsGoal || loading || (changeInfo && !changeInfo.canChange)
                 ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                 : 'bg-primary-600 text-white hover:bg-primary-700'
             }`}
           >
             {loading ? 'Wird erstellt...' : currentSetup ? 'Setup ändern' : 'Setup starten'}
           </button>
+          
+          {changeInfo && !changeInfo.canChange && (
+            <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+              <p className="text-sm text-yellow-800">
+                Du hast dein Limit von 3 Änderungen diesen Monat erreicht. Du kannst die App weiterhin normal nutzen. Das Limit wird am 1. des nächsten Monats zurückgesetzt.
+              </p>
+              <button
+                onClick={() => navigate('/')}
+                className="mt-3 w-full py-2 text-sm font-medium rounded-lg bg-primary-600 text-white hover:bg-primary-700 transition-colors"
+              >
+                Zurück zum Dashboard
+              </button>
+            </div>
+          )}
           
           {!savingsGoal && (
             <p className="text-sm text-danger-600 mt-2 text-center">

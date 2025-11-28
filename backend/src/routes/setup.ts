@@ -1,5 +1,5 @@
 import express from 'express'
-import { setMonthlySetup, getMonthlySetup, calculateFixedCosts, isNewMonth } from '../services/monthlySetup'
+import { setMonthlySetup, getMonthlySetup, calculateFixedCosts, isNewMonth, canChangeSetup, incrementChangeCount } from '../services/monthlySetup'
 import { getTransactions, getUpcomingTransactions } from '../services/dataService'
 
 const router = express.Router()
@@ -11,9 +11,14 @@ router.get('/', async (req, res) => {
     if (!setup || await isNewMonth()) {
       return res.json({ needsSetup: true })
     }
+    const changeInfo = await canChangeSetup()
     res.json({ 
       needsSetup: false, 
-      setup
+      setup,
+      changeInfo: {
+        remaining: changeInfo.remaining,
+        canChange: changeInfo.allowed
+      }
     })
   } catch (error) {
     console.error('Error getting setup:', error)
@@ -46,6 +51,18 @@ router.post('/', async (req, res) => {
     }
 
     const existingSetup = await getMonthlySetup()
+    
+    // Check if this is a change (not initial setup)
+    if (existingSetup && !(await isNewMonth())) {
+      const changeCheck = await canChangeSetup()
+      if (!changeCheck.allowed) {
+        return res.status(403).json({
+          error: 'Du hast bereits 3 Mal dein Sparziel diesen Monat geändert. Das Limit wird am 1. des nächsten Monats zurückgesetzt.',
+          remaining: 0
+        })
+      }
+    }
+
     const transactions = await getTransactions()
     const upcoming = await getUpcomingTransactions()
     const fixedCosts = calculateFixedCosts(transactions, upcoming)
@@ -59,6 +76,23 @@ router.post('/', async (req, res) => {
     const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate()
     const dailyLimit = variableBudget / daysInMonth
 
+    const currentMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`
+    
+    // Determine change count
+    let changeCount = 0
+    let changeMonth = currentMonth
+    
+    if (existingSetup && !(await isNewMonth())) {
+      // This is a change, increment counter
+      await incrementChangeCount()
+      const updatedSetup = await getMonthlySetup()
+      changeCount = updatedSetup?.changeCount || 1
+      changeMonth = updatedSetup?.changeMonth || currentMonth
+    } else {
+      // This is initial setup or new month
+      changeCount = 1
+    }
+
     const setup = {
       savingsGoal,
       fixedCosts,
@@ -66,10 +100,20 @@ router.post('/', async (req, res) => {
       variableBudget,
       dailyLimit,
       monthStartDate: existingSetup && !(await isNewMonth()) ? existingSetup.monthStartDate : new Date().toISOString(),
+      changeCount,
+      changeMonth,
     }
 
     await setMonthlySetup(setup)
-    res.json(setup)
+    
+    const changeInfo = await canChangeSetup()
+    res.json({
+      ...setup,
+      changeInfo: {
+        remaining: changeInfo.remaining,
+        canChange: changeInfo.allowed
+      }
+    })
   } catch (error: any) {
     console.error('Error creating setup:', error)
     const errorMessage = error?.message || 'Failed to create setup'

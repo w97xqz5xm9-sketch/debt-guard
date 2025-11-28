@@ -83,6 +83,8 @@ export async function initDatabase(): Promise<void> {
         variable_budget DECIMAL(10, 2) NOT NULL,
         daily_limit DECIMAL(10, 2) NOT NULL,
         month_start_date TIMESTAMP NOT NULL,
+        change_count INTEGER DEFAULT 0,
+        change_month VARCHAR(7),
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )

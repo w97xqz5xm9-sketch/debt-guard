@@ -10,6 +10,8 @@ export interface MonthlySetup {
   variableBudget: number // What can be spent variably
   dailyLimit: number // Daily spending limit
   monthStartDate: string
+  changeCount?: number // Number of times setup was changed this month
+  changeMonth?: string // Month when changes were tracked (YYYY-MM format)
 }
 
 let currentSetup: MonthlySetup | null = null
@@ -41,6 +43,8 @@ export async function getMonthlySetup(): Promise<MonthlySetup | null> {
         variableBudget: parseFloat(row.variable_budget),
         dailyLimit: parseFloat(row.daily_limit),
         monthStartDate: row.month_start_date.toISOString(),
+        changeCount: row.change_count || 0,
+        changeMonth: row.change_month || undefined,
       }
     } catch (error) {
       console.error('Error fetching setup from database:', error)
@@ -68,8 +72,8 @@ export async function setMonthlySetup(setup: MonthlySetup | null): Promise<void>
       // Delete existing setup and insert new one
       await query('DELETE FROM monthly_setup')
       await query(
-        `INSERT INTO monthly_setup (savings_goal, fixed_costs, monthly_income, variable_budget, daily_limit, month_start_date)
-         VALUES ($1, $2, $3, $4, $5, $6)`,
+        `INSERT INTO monthly_setup (savings_goal, fixed_costs, monthly_income, variable_budget, daily_limit, month_start_date, change_count, change_month)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
         [
           setup.savingsGoal,
           setup.fixedCosts,
@@ -77,6 +81,8 @@ export async function setMonthlySetup(setup: MonthlySetup | null): Promise<void>
           setup.variableBudget,
           setup.dailyLimit,
           setup.monthStartDate,
+          setup.changeCount || 0,
+          setup.changeMonth || null,
         ]
       )
     } catch (error) {
@@ -98,6 +104,51 @@ export async function isNewMonth(): Promise<boolean> {
   // Check if we're in a different month
   return now.getMonth() !== setupDate.getMonth() || 
          now.getFullYear() !== setupDate.getFullYear()
+}
+
+// Check if setup can be changed (max 3 times per month)
+export async function canChangeSetup(): Promise<{ allowed: boolean; remaining: number }> {
+  const setup = await getMonthlySetup()
+  if (!setup) {
+    return { allowed: true, remaining: 3 }
+  }
+
+  const now = new Date()
+  const currentMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`
+  
+  // Reset counter if it's a new month
+  if (setup.changeMonth !== currentMonth) {
+    return { allowed: true, remaining: 3 }
+  }
+
+  const changeCount = setup.changeCount || 0
+  const remaining = Math.max(0, 3 - changeCount)
+
+  if (changeCount >= 3) {
+    return { allowed: false, remaining: 0 }
+  }
+
+  return { allowed: true, remaining }
+}
+
+// Increment change count when setup is changed
+export async function incrementChangeCount(): Promise<void> {
+  const setup = await getMonthlySetup()
+  if (!setup) return
+
+  const now = new Date()
+  const currentMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`
+  
+  // Reset counter if it's a new month
+  if (setup.changeMonth !== currentMonth) {
+    setup.changeCount = 1
+    setup.changeMonth = currentMonth
+  } else {
+    setup.changeCount = (setup.changeCount || 0) + 1
+  }
+
+  // Save updated setup
+  await setMonthlySetup(setup)
 }
 
 // Calculate fixed costs from transaction history
