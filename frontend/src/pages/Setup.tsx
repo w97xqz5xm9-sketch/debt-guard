@@ -152,12 +152,14 @@ export default function Setup({ onComplete }: SetupProps) {
       
       console.error('Full error:', error)
       // Don't show alert if access code is required - the UI already shows it
-      if (!error.response?.data?.requiresAccessCode) {
-        alert(`${errorMessage}\n\nBitte öffne die Browser-Konsole (F12) für mehr Details.`)
-      } else {
+      if (error.response?.data?.requiresAccessCode) {
         // Just reload the setup to show the access code input
         await loadCurrentSetup()
+        // Don't show any alert - the UI already displays the message
+        return
       }
+      // Only show alert for other errors
+      alert(`${errorMessage}\n\nBitte öffne die Browser-Konsole (F12) für mehr Details.`)
     } finally {
       setLoading(false)
     }
