@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, HashRouter } from 'react-router-dom'
+import { Routes, Route, HashRouter } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import Dashboard from './pages/Dashboard'
 import Budget from './pages/Budget'
