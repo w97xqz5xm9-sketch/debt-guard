@@ -158,12 +158,12 @@ export default function Setup({ onComplete }: SetupProps) {
                     <p className="text-xs text-yellow-700 mt-1">
                       Das Limit wird am 1. des nächsten Monats zurückgesetzt. Du kannst die App weiterhin normal nutzen.
                     </p>
-                    <a
-                      href="/"
-                      className="text-sm text-primary-600 hover:underline mt-2 inline-block"
+                    <button
+                      onClick={() => navigate('/')}
+                      className="mt-3 w-full btn-primary text-sm"
                     >
-                      Zurück zum Dashboard →
-                    </a>
+                      Zurück zum Dashboard
+                    </button>
                   </div>
                 )}
               </div>

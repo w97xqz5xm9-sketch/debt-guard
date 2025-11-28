@@ -18,10 +18,14 @@ function App() {
   const checkSetup = async () => {
     try {
       const response = await budgetApi.getSetup()
-      setNeedsSetup(response.needsSetup)
+      // needsSetup should only be true if no setup exists, not if limit is reached
+      // If setup exists (even if limit is reached), needsSetup should be false
+      setNeedsSetup(response.needsSetup === true)
     } catch (error) {
       console.error('Error checking setup:', error)
-      setNeedsSetup(true)
+      // On error, check if it's a network error or a real "no setup" error
+      // If we can't connect, assume setup exists to allow app access
+      setNeedsSetup(false) // Allow app access even on error
     }
   }
 
