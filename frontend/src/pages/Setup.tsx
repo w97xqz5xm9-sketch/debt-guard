@@ -116,6 +116,12 @@ export default function Setup({ onComplete }: SetupProps) {
       // Reload setup info to get updated change info
       await loadCurrentSetup()
       
+      // If limit reached, don't navigate away - stay on setup page
+      if (currentSetup && response.changeInfo && !response.changeInfo.canChange) {
+        // Don't navigate, user should see the limit message
+        return
+      }
+      
       if (onComplete) {
         await onComplete()
       }
