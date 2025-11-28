@@ -49,6 +49,7 @@ export default function Setup({ onComplete }: SetupProps) {
   const loadCurrentSetup = async () => {
     try {
       const response = await budgetApi.getSetup()
+      // Always load setup if it exists, even if limit is reached
       if (!response.needsSetup && response.setup) {
         setCurrentSetup(response.setup)
         setSavingsGoal(response.setup.savingsGoal)
@@ -56,9 +57,16 @@ export default function Setup({ onComplete }: SetupProps) {
         if (response.changeInfo) {
           setChangeInfo(response.changeInfo)
         }
+      } else if (response.needsSetup) {
+        // No setup exists, this is initial setup
+        setCurrentSetup(null)
+        setChangeInfo(null)
       }
     } catch (error) {
       console.error('Error loading current setup:', error)
+      // On error, assume no setup exists
+      setCurrentSetup(null)
+      setChangeInfo(null)
     }
   }
 
@@ -213,9 +221,20 @@ export default function Setup({ onComplete }: SetupProps) {
           </button>
           
           {currentSetup && changeInfo && !changeInfo.canChange && (
-            <p className="text-sm text-danger-600 mt-2 text-center">
-              Du hast bereits 3 Mal dein Sparziel diesen Monat geändert. Das Limit wird am 1. des nächsten Monats zurückgesetzt.
-            </p>
+            <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+              <p className="text-sm text-yellow-900 font-medium mb-2">
+                ⚠️ Limit erreicht
+              </p>
+              <p className="text-sm text-yellow-800">
+                Du hast bereits 3 Mal dein Sparziel diesen Monat geändert. Das Limit wird am 1. des nächsten Monats zurückgesetzt.
+              </p>
+              <button
+                onClick={() => navigate('/')}
+                className="mt-3 w-full btn-primary text-sm"
+              >
+                Zurück zur App
+              </button>
+            </div>
           )}
           
           {!savingsGoal && (
