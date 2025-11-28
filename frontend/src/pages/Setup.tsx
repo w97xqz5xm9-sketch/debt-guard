@@ -78,18 +78,11 @@ export default function Setup({ onComplete }: SetupProps) {
   const handleSubmit = async () => {
     if (!savingsGoal) return
 
-    // Show info about remaining changes if this is a change (not initial setup)
-    if (currentSetup && changeInfo) {
-      if (!changeInfo.canChange) {
-        alert('Du hast bereits 3 Mal dein Sparziel diesen Monat geändert. Das Limit wird am 1. des nächsten Monats zurückgesetzt.')
-        return
-      }
-      if (changeInfo.remaining < 3) {
-        const confirmMessage = `Du hast noch ${changeInfo.remaining} Änderung${changeInfo.remaining !== 1 ? 'en' : ''} diesen Monat möglich.\n\nMöchtest du fortfahren?`
-        if (!window.confirm(confirmMessage)) {
-          return
-        }
-      }
+    // Check if access code is required
+    if (currentSetup && changeInfo && changeInfo.requiresAccessCode && !accessCode) {
+      setShowAccessCodeInput(true)
+      alert('Bitte gib einen Zugangscode ein, um weitere Änderungen zu machen.')
+      return
     }
 
     setLoading(true)
@@ -97,6 +90,7 @@ export default function Setup({ onComplete }: SetupProps) {
       const response = await budgetApi.saveSetup({
         savingsGoal,
         monthlyIncome: parseFloat(monthlyIncome) || 3000,
+        accessCode: accessCode || undefined,
       })
       console.log('Setup created:', response)
       
@@ -106,9 +100,18 @@ export default function Setup({ onComplete }: SetupProps) {
         if (remaining > 0) {
           alert(`✅ Setup erfolgreich geändert!\n\nDu hast noch ${remaining} Änderung${remaining !== 1 ? 'en' : ''} diesen Monat möglich.`)
         } else {
-          alert('✅ Setup erfolgreich geändert!\n\nDu hast dein Limit für diesen Monat erreicht. Das Limit wird am 1. des nächsten Monats zurückgesetzt.')
+          alert('✅ Setup erfolgreich geändert!\n\nDu hast dein Limit für diesen Monat erreicht. Für weitere Änderungen benötigst du einen Zugangscode.')
         }
+      } else if (!currentSetup) {
+        alert('✅ Setup erfolgreich erstellt!')
       }
+      
+      // Reset access code input
+      setAccessCode('')
+      setShowAccessCodeInput(false)
+      
+      // Reload setup info to get updated change info
+      await loadCurrentSetup()
       
       if (onComplete) {
         onComplete()
@@ -121,6 +124,9 @@ export default function Setup({ onComplete }: SetupProps) {
       if (error.response) {
         // Server responded with error
         errorMessage = error.response.data?.error || `Server-Fehler: ${error.response.status}`
+        if (error.response.data?.requiresAccessCode) {
+          setShowAccessCodeInput(true)
+        }
       } else if (error.request) {
         // Request made but no response
         errorMessage = 'Keine Verbindung zum Backend. Bitte prüfe die Backend-URL in den Render-Einstellungen.'
@@ -226,12 +232,12 @@ export default function Setup({ onComplete }: SetupProps) {
             </div>
           )}
 
-          {(!currentSetup || (changeInfo && changeInfo.canChange)) && (
+          {(!currentSetup || (changeInfo && (changeInfo.canChange || (changeInfo.requiresAccessCode && accessCode)))) && (
             <button
               onClick={handleSubmit}
-              disabled={!savingsGoal || loading}
+              disabled={!savingsGoal || loading || (changeInfo?.requiresAccessCode && !accessCode)}
               className={`w-full py-3 text-lg font-medium rounded-lg transition-colors ${
-                !savingsGoal || loading
+                !savingsGoal || loading || (changeInfo?.requiresAccessCode && !accessCode)
                   ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                   : 'bg-primary-600 text-white hover:bg-primary-700'
               }`}
@@ -240,7 +246,7 @@ export default function Setup({ onComplete }: SetupProps) {
             </button>
           )}
           
-          {currentSetup && changeInfo && !changeInfo.canChange && (
+          {currentSetup && changeInfo && !changeInfo.canChange && !changeInfo.requiresAccessCode && (
             <div className="space-y-3">
               <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
                 <p className="text-sm text-yellow-900 font-medium mb-2">

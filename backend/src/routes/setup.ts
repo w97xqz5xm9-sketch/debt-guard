@@ -17,7 +17,8 @@ router.get('/', async (req, res) => {
       setup,
       changeInfo: {
         remaining: changeInfo.remaining,
-        canChange: changeInfo.allowed
+        canChange: changeInfo.allowed,
+        requiresAccessCode: changeInfo.requiresAccessCode
       }
     })
   } catch (error) {
@@ -119,7 +120,8 @@ router.post('/', async (req, res) => {
       ...setup,
       changeInfo: {
         remaining: changeInfo.remaining,
-        canChange: changeInfo.allowed
+        canChange: changeInfo.allowed,
+        requiresAccessCode: changeInfo.requiresAccessCode
       }
     })
   } catch (error: any) {
