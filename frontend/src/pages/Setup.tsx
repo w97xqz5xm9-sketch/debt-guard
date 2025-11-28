@@ -72,9 +72,14 @@ export default function Setup({ onComplete }: SetupProps) {
       })
       
       if (onComplete) {
-        onComplete()
+        await onComplete()
       }
-      navigate('/')
+      // Use window.location for initial setup to force full reload
+      if (!currentSetup) {
+        window.location.href = '/#/'
+      } else {
+        navigate('/')
+      }
     } catch (error: any) {
       console.error('Error creating setup:', error)
       let errorMessage = 'Fehler beim Erstellen des Setups'

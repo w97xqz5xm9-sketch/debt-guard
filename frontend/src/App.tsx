@@ -41,7 +41,7 @@ function App() {
     return (
       <RouterComponent>
         <Routes>
-          <Route path="*" element={<Setup />} />
+          <Route path="*" element={<Setup onComplete={() => checkSetup()} />} />
         </Routes>
       </RouterComponent>
     )
