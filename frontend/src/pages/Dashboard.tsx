@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { AlertTriangle, TrendingDown, Shield, Zap } from 'lucide-react'
 import { budgetApi } from '../services/api'
 import type { Budget, Transaction, BudgetCalculation } from '../types'
@@ -65,12 +66,12 @@ export default function Dashboard() {
     <div className="space-y-6">
       {/* Quick Action */}
       <div className="flex justify-end">
-        <a
-          href="/setup"
+        <Link
+          to="/setup"
           className="btn-secondary flex items-center space-x-2"
         >
           <span>Setup ändern</span>
-        </a>
+        </Link>
       </div>
 
       {/* Hero Section - Simplified */}

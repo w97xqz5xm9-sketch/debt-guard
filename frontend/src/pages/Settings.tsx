@@ -174,12 +174,12 @@ export default function Settings() {
       <div className="card">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-2xl font-bold">Einstellungen</h2>
-          <a
-            href="/setup"
+          <Link
+            to="/setup"
             className="btn-secondary flex items-center space-x-2"
           >
             <span>Setup ändern</span>
-          </a>
+          </Link>
         </div>
 
         {/* Accounts */}
