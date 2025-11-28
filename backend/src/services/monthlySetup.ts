@@ -9,8 +9,6 @@ export interface MonthlySetup {
   variableBudget: number // What can be spent variably
   dailyLimit: number // Daily spending limit
   monthStartDate: string
-  changeCount?: number // Number of times setup was changed this month
-  changeMonth?: string // Month when changes were tracked (YYYY-MM format)
 }
 
 let currentSetup: MonthlySetup | null = null

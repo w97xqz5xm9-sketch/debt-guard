@@ -39,9 +39,6 @@ export default function Setup({ onComplete }: SetupProps) {
   const [monthlyIncome, setMonthlyIncome] = useState('3000')
   const [loading, setLoading] = useState(false)
   const [currentSetup, setCurrentSetup] = useState<any>(null)
-  const [changeInfo, setChangeInfo] = useState<{ remaining: number; canChange: boolean; requiresAccessCode?: boolean } | null>(null)
-  const [showAccessCodeInput, setShowAccessCodeInput] = useState(false)
-  const [accessCode, setAccessCode] = useState('')
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -51,75 +48,28 @@ export default function Setup({ onComplete }: SetupProps) {
   const loadCurrentSetup = async () => {
     try {
       const response = await budgetApi.getSetup()
-      // Always load setup if it exists, even if limit is reached
       if (!response.needsSetup && response.setup) {
         setCurrentSetup(response.setup)
         setSavingsGoal(response.setup.savingsGoal)
         setMonthlyIncome(response.setup.monthlyIncome.toString())
-        if (response.changeInfo) {
-          setChangeInfo({
-            remaining: response.changeInfo.remaining,
-            canChange: response.changeInfo.canChange,
-            requiresAccessCode: response.changeInfo.requiresAccessCode || false
-          })
-          if (response.changeInfo.requiresAccessCode) {
-            setShowAccessCodeInput(true)
-          } else {
-            setShowAccessCodeInput(false)
-          }
-        }
-      } else if (response.needsSetup) {
-        // No setup exists, this is initial setup
+      } else {
         setCurrentSetup(null)
-        setChangeInfo(null)
-        setShowAccessCodeInput(false)
       }
     } catch (error) {
       console.error('Error loading current setup:', error)
-      // On error, assume no setup exists
       setCurrentSetup(null)
-      setChangeInfo(null)
-      setShowAccessCodeInput(false)
     }
   }
 
   const handleSubmit = async () => {
     if (!savingsGoal) return
 
-    // Check if access code is required
-    if (currentSetup && changeInfo && changeInfo.requiresAccessCode && !accessCode) {
-      setShowAccessCodeInput(true)
-      alert('Bitte gib einen Zugangscode ein, um weitere Änderungen zu machen.')
-      return
-    }
-
     setLoading(true)
     try {
-      const response = await budgetApi.saveSetup({
+      await budgetApi.saveSetup({
         savingsGoal,
         monthlyIncome: parseFloat(monthlyIncome) || 3000,
-        accessCode: accessCode || undefined,
       })
-      console.log('Setup created:', response)
-      
-      // Show success message with remaining changes
-      if (currentSetup && response.changeInfo) {
-        const remaining = response.changeInfo.remaining
-        if (remaining > 0) {
-          alert(`✅ Setup erfolgreich geändert!\n\nDu hast noch ${remaining} Änderung${remaining !== 1 ? 'en' : ''} diesen Monat möglich.`)
-        } else {
-          alert('✅ Setup erfolgreich geändert!\n\nDu hast dein Limit für diesen Monat erreicht. Für weitere Änderungen benötigst du einen Zugangscode.')
-        }
-      } else if (!currentSetup) {
-        alert('✅ Setup erfolgreich erstellt!')
-      }
-      
-      // Reset access code input
-      setAccessCode('')
-      setShowAccessCodeInput(false)
-      
-      // Reload setup info to get updated change info
-      await loadCurrentSetup()
       
       if (onComplete) {
         onComplete()
@@ -130,35 +80,13 @@ export default function Setup({ onComplete }: SetupProps) {
       let errorMessage = 'Fehler beim Erstellen des Setups'
       
       if (error.response) {
-        // Server responded with error
         errorMessage = error.response.data?.error || `Server-Fehler: ${error.response.status}`
-        if (error.response.data?.requiresAccessCode) {
-          setShowAccessCodeInput(true)
-          // Update changeInfo to show access code input
-          if (changeInfo) {
-            setChangeInfo({
-              ...changeInfo,
-              requiresAccessCode: true,
-              canChange: false
-            })
-          }
-        }
       } else if (error.request) {
-        // Request made but no response
         errorMessage = 'Keine Verbindung zum Backend. Bitte prüfe die Backend-URL in den Render-Einstellungen.'
       } else {
         errorMessage = error.message || errorMessage
       }
       
-      console.error('Full error:', error)
-      // Don't show alert if access code is required - the UI already shows it
-      if (error.response?.data?.requiresAccessCode) {
-        // Just reload the setup to show the access code input
-        await loadCurrentSetup()
-        // Don't show any alert - the UI already displays the message
-        return
-      }
-      // Only show alert for other errors
       alert(`${errorMessage}\n\nBitte öffne die Browser-Konsole (F12) für mehr Details.`)
     } finally {
       setLoading(false)
@@ -179,24 +107,6 @@ export default function Setup({ onComplete }: SetupProps) {
             <p className="text-gray-600">
               {currentSetup ? 'Ändere dein Sparziel oder Einkommen' : 'Wähle dein Sparziel für diesen Monat'}
             </p>
-            {currentSetup && changeInfo && (
-              <div className="mt-2">
-                {changeInfo.canChange && !changeInfo.requiresAccessCode ? (
-                  <p className="text-sm text-gray-500">
-                    Noch {changeInfo.remaining} Änderung{changeInfo.remaining !== 1 ? 'en' : ''} diesen Monat möglich
-                  </p>
-                ) : changeInfo.requiresAccessCode ? (
-                  <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-                    <p className="text-sm text-yellow-800 font-medium">
-                      ⚠️ Limit erreicht: Du hast bereits 3 Mal dein Sparziel diesen Monat geändert.
-                    </p>
-                    <p className="text-xs text-yellow-700 mt-1">
-                      Gib einen Zugangscode ein, um weitere Änderungen zu machen.
-                    </p>
-                  </div>
-                ) : null}
-              </div>
-            )}
           </div>
 
           <div className="space-y-4 mb-6">
@@ -237,39 +147,17 @@ export default function Setup({ onComplete }: SetupProps) {
             </p>
           </div>
 
-          {/* Access Code Input */}
-          {(showAccessCodeInput || (changeInfo && changeInfo.requiresAccessCode)) && (
-            <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-              <label className="block text-sm font-medium text-yellow-900 mb-2">
-                Zugangscode (erforderlich)
-              </label>
-              <input
-                type="text"
-                value={accessCode}
-                onChange={(e) => setAccessCode(e.target.value)}
-                className="w-full px-4 py-2 border border-yellow-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                placeholder="Zugangscode eingeben"
-              />
-              <p className="text-xs text-yellow-700 mt-1">
-                Du hast bereits 3 Mal dein Sparziel geändert. Gib einen Zugangscode ein, um weitere Änderungen zu machen.
-              </p>
-            </div>
-          )}
-
-          {(!currentSetup || (changeInfo && (changeInfo.canChange || (changeInfo.requiresAccessCode && accessCode)))) && (
-            <button
-              onClick={handleSubmit}
-              disabled={!savingsGoal || loading || (changeInfo?.requiresAccessCode && !accessCode)}
-              className={`w-full py-3 text-lg font-medium rounded-lg transition-colors ${
-                !savingsGoal || loading || (changeInfo?.requiresAccessCode && !accessCode)
-                  ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                  : 'bg-primary-600 text-white hover:bg-primary-700'
-              }`}
-            >
-              {loading ? 'Wird erstellt...' : currentSetup ? 'Setup ändern' : 'Setup starten'}
-            </button>
-          )}
-          
+          <button
+            onClick={handleSubmit}
+            disabled={!savingsGoal || loading}
+            className={`w-full py-3 text-lg font-medium rounded-lg transition-colors ${
+              !savingsGoal || loading
+                ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                : 'bg-primary-600 text-white hover:bg-primary-700'
+            }`}
+          >
+            {loading ? 'Wird erstellt...' : currentSetup ? 'Setup ändern' : 'Setup starten'}
+          </button>
           
           {!savingsGoal && (
             <p className="text-sm text-danger-600 mt-2 text-center">
@@ -302,4 +190,3 @@ export default function Setup({ onComplete }: SetupProps) {
     </div>
   )
 }
-
