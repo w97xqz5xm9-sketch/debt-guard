@@ -194,9 +194,9 @@ export default function Setup({ onComplete }: SetupProps) {
 
           <button
             onClick={handleSubmit}
-            disabled={!savingsGoal || loading || (changeInfo && !changeInfo.canChange)}
+            disabled={!savingsGoal || loading || (changeInfo !== null && !changeInfo.canChange)}
             className={`w-full py-3 text-lg font-medium rounded-lg transition-colors ${
-              !savingsGoal || loading || (changeInfo && !changeInfo.canChange)
+              !savingsGoal || loading || (changeInfo !== null && !changeInfo.canChange)
                 ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                 : 'bg-primary-600 text-white hover:bg-primary-700'
             }`}
