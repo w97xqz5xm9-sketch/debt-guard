@@ -39,6 +39,7 @@ export default function Setup({ onComplete }: SetupProps) {
   const [monthlyIncome, setMonthlyIncome] = useState('3000')
   const [loading, setLoading] = useState(false)
   const [currentSetup, setCurrentSetup] = useState<any>(null)
+  const [changeInfo, setChangeInfo] = useState<{ remaining: number; canChange: boolean } | null>(null)
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -52,6 +53,9 @@ export default function Setup({ onComplete }: SetupProps) {
         setCurrentSetup(response.setup)
         setSavingsGoal(response.setup.savingsGoal)
         setMonthlyIncome(response.setup.monthlyIncome.toString())
+        if (response.changeInfo) {
+          setChangeInfo(response.changeInfo)
+        }
       }
     } catch (error) {
       console.error('Error loading current setup:', error)
@@ -107,6 +111,11 @@ export default function Setup({ onComplete }: SetupProps) {
             <p className="text-gray-600">
               {currentSetup ? 'Ändere dein Sparziel oder Einkommen' : 'Wähle dein Sparziel für diesen Monat'}
             </p>
+            {currentSetup && changeInfo && (
+              <p className="text-sm text-gray-500 mt-2">
+                Noch {changeInfo.remaining} Änderung{changeInfo.remaining !== 1 ? 'en' : ''} diesen Monat möglich
+              </p>
+            )}
           </div>
 
           <div className="space-y-4 mb-6">
@@ -149,15 +158,21 @@ export default function Setup({ onComplete }: SetupProps) {
 
           <button
             onClick={handleSubmit}
-            disabled={!savingsGoal || loading}
+            disabled={!savingsGoal || loading || (currentSetup && changeInfo && !changeInfo.canChange)}
             className={`w-full py-3 text-lg font-medium rounded-lg transition-colors ${
-              !savingsGoal || loading
+              !savingsGoal || loading || (currentSetup && changeInfo && !changeInfo.canChange)
                 ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                 : 'bg-primary-600 text-white hover:bg-primary-700'
             }`}
           >
-            {loading ? 'Wird erstellt...' : 'Setup starten'}
+            {loading ? 'Wird erstellt...' : currentSetup ? 'Setup ändern' : 'Setup starten'}
           </button>
+          
+          {currentSetup && changeInfo && !changeInfo.canChange && (
+            <p className="text-sm text-danger-600 mt-2 text-center">
+              Du hast bereits 3 Mal dein Sparziel diesen Monat geändert. Das Limit wird am 1. des nächsten Monats zurückgesetzt.
+            </p>
+          )}
           
           {!savingsGoal && (
             <p className="text-sm text-danger-600 mt-2 text-center">
