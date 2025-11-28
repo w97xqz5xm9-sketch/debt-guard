@@ -143,7 +143,10 @@ export default function Setup({ onComplete }: SetupProps) {
       }
       
       console.error('Full error:', error)
-      alert(`${errorMessage}\n\nBitte öffne die Browser-Konsole (F12) für mehr Details.`)
+      // Don't show alert if access code is required - the UI already shows it
+      if (!error.response?.data?.requiresAccessCode) {
+        alert(`${errorMessage}\n\nBitte öffne die Browser-Konsole (F12) für mehr Details.`)
+      }
     } finally {
       setLoading(false)
     }
