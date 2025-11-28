@@ -65,6 +65,20 @@ export default function Setup({ onComplete }: SetupProps) {
   const handleSubmit = async () => {
     if (!savingsGoal) return
 
+    // Show info about remaining changes if this is a change (not initial setup)
+    if (currentSetup && changeInfo) {
+      if (!changeInfo.canChange) {
+        alert('Du hast bereits 3 Mal dein Sparziel diesen Monat geändert. Das Limit wird am 1. des nächsten Monats zurückgesetzt.')
+        return
+      }
+      if (changeInfo.remaining < 3) {
+        const confirmMessage = `Du hast noch ${changeInfo.remaining} Änderung${changeInfo.remaining !== 1 ? 'en' : ''} diesen Monat möglich.\n\nMöchtest du fortfahren?`
+        if (!window.confirm(confirmMessage)) {
+          return
+        }
+      }
+    }
+
     setLoading(true)
     try {
       const response = await budgetApi.saveSetup({
@@ -72,6 +86,17 @@ export default function Setup({ onComplete }: SetupProps) {
         monthlyIncome: parseFloat(monthlyIncome) || 3000,
       })
       console.log('Setup created:', response)
+      
+      // Show success message with remaining changes
+      if (currentSetup && response.changeInfo) {
+        const remaining = response.changeInfo.remaining
+        if (remaining > 0) {
+          alert(`✅ Setup erfolgreich geändert!\n\nDu hast noch ${remaining} Änderung${remaining !== 1 ? 'en' : ''} diesen Monat möglich.`)
+        } else {
+          alert('✅ Setup erfolgreich geändert!\n\nDu hast dein Limit für diesen Monat erreicht. Das Limit wird am 1. des nächsten Monats zurückgesetzt.')
+        }
+      }
+      
       if (onComplete) {
         onComplete()
       }
