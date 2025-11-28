@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import { BrowserRouter as Router, Routes, Route, HashRouter } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import Dashboard from './pages/Dashboard'
 import Budget from './pages/Budget'
@@ -30,18 +30,21 @@ function App() {
     return <div className="min-h-screen flex items-center justify-center">Lade...</div>
   }
 
+  // Use HashRouter for Render.com static site compatibility
+  const RouterComponent = HashRouter
+
   if (needsSetup) {
     return (
-      <Router>
+      <RouterComponent>
         <Routes>
           <Route path="*" element={<Setup />} />
         </Routes>
-      </Router>
+      </RouterComponent>
     )
   }
 
   return (
-    <Router>
+    <RouterComponent>
       <Routes>
         <Route path="/setup" element={<Setup onComplete={() => checkSetup()} />} />
         <Route path="/" element={<Layout><Dashboard /></Layout>} />
@@ -49,7 +52,7 @@ function App() {
         <Route path="/explanation" element={<Layout><Explanation /></Layout>} />
         <Route path="/settings" element={<Layout><Settings /></Layout>} />
       </Routes>
-    </Router>
+    </RouterComponent>
   )
 }
 
