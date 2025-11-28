@@ -106,6 +106,7 @@ router.post('/', async (req, res) => {
 
     await setMonthlySetup(setup)
     
+    // Always return changeInfo, even for initial setup
     const changeInfo = await canChangeSetup()
     res.json({
       ...setup,
