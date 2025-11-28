@@ -43,7 +43,7 @@ export async function getMonthlySetup(): Promise<MonthlySetup | null> {
         variableBudget: parseFloat(row.variable_budget),
         dailyLimit: parseFloat(row.daily_limit),
         monthStartDate: row.month_start_date.toISOString(),
-        changeCount: row.change_count || 0,
+        changeCount: row.change_count !== null ? parseInt(row.change_count) : 0,
         changeMonth: row.change_month || undefined,
       }
     } catch (error) {
