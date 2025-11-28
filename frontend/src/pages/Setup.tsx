@@ -126,6 +126,14 @@ export default function Setup({ onComplete }: SetupProps) {
         errorMessage = error.response.data?.error || `Server-Fehler: ${error.response.status}`
         if (error.response.data?.requiresAccessCode) {
           setShowAccessCodeInput(true)
+          // Update changeInfo to show access code input
+          if (changeInfo) {
+            setChangeInfo({
+              ...changeInfo,
+              requiresAccessCode: true,
+              canChange: false
+            })
+          }
         }
       } else if (error.request) {
         // Request made but no response
@@ -246,24 +254,6 @@ export default function Setup({ onComplete }: SetupProps) {
             </button>
           )}
           
-          {currentSetup && changeInfo && !changeInfo.canChange && !changeInfo.requiresAccessCode && (
-            <div className="space-y-3">
-              <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-                <p className="text-sm text-yellow-900 font-medium mb-2">
-                  ⚠️ Limit erreicht
-                </p>
-                <p className="text-sm text-yellow-800">
-                  Du hast bereits 3 Mal dein Sparziel diesen Monat geändert. Das Limit wird am 1. des nächsten Monats zurückgesetzt.
-                </p>
-              </div>
-              <button
-                onClick={() => navigate('/')}
-                className="w-full btn-primary"
-              >
-                Zurück zum Dashboard
-              </button>
-            </div>
-          )}
           
           {!savingsGoal && (
             <p className="text-sm text-danger-600 mt-2 text-center">
