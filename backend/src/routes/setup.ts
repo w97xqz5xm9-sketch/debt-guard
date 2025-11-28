@@ -7,8 +7,8 @@ const router = express.Router()
 // Get current setup
 router.get('/', async (req, res) => {
   try {
-    const setup = getMonthlySetup()
-    if (!setup || isNewMonth()) {
+    const setup = await getMonthlySetup()
+    if (!setup || await isNewMonth()) {
       return res.json({ needsSetup: true })
     }
     res.json({ 
@@ -24,7 +24,7 @@ router.get('/', async (req, res) => {
 // Reset setup (for testing)
 router.delete('/', async (req, res) => {
   try {
-    setMonthlySetup(null as any)
+    await setMonthlySetup(null)
     res.json({ success: true, message: 'Setup zurückgesetzt' })
   } catch (error) {
     console.error('Error resetting setup:', error)
@@ -45,7 +45,7 @@ router.post('/', async (req, res) => {
       })
     }
 
-    const existingSetup = getMonthlySetup()
+    const existingSetup = await getMonthlySetup()
     const transactions = await getTransactions()
     const upcoming = await getUpcomingTransactions()
     const fixedCosts = calculateFixedCosts(transactions, upcoming)
@@ -65,10 +65,10 @@ router.post('/', async (req, res) => {
       monthlyIncome: income,
       variableBudget,
       dailyLimit,
-      monthStartDate: existingSetup && !isNewMonth() ? existingSetup.monthStartDate : new Date().toISOString(),
+      monthStartDate: existingSetup && !(await isNewMonth()) ? existingSetup.monthStartDate : new Date().toISOString(),
     }
 
-    setMonthlySetup(setup)
+    await setMonthlySetup(setup)
     res.json(setup)
   } catch (error: any) {
     console.error('Error creating setup:', error)

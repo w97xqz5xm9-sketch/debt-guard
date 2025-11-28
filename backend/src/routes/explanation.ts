@@ -8,7 +8,7 @@ const router = express.Router()
 // Get limit calculation explanation
 router.get('/', async (req, res) => {
   try {
-    const setup = getMonthlySetup()
+    const setup = await getMonthlySetup()
     if (!setup) {
       return res.json({
         error: 'Kein Setup vorhanden',

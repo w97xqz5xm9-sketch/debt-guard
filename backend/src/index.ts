@@ -10,6 +10,7 @@ import setupRoutes from './routes/setup'
 import unlockRoutes from './routes/unlock'
 import explanationRoutes from './routes/explanation'
 import fixedCostRoutes from './routes/fixedCosts'
+import { initDatabase } from './services/database'
 
 dotenv.config()
 
@@ -44,7 +45,18 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', message: 'Debt Guard API is running' })
 })
 
-app.listen(PORT, () => {
-  console.log(`🚀 Debt Guard Backend running on http://localhost:${PORT}`)
-})
+// Initialize database and start server
+initDatabase()
+  .then(() => {
+    app.listen(PORT, () => {
+      console.log(`🚀 Debt Guard Backend running on http://localhost:${PORT}`)
+    })
+  })
+  .catch((error) => {
+    console.error('Failed to initialize database:', error)
+    // Still start server for in-memory mode
+    app.listen(PORT, () => {
+      console.log(`🚀 Debt Guard Backend running on http://localhost:${PORT} (in-memory mode)`)
+    })
+  })
 

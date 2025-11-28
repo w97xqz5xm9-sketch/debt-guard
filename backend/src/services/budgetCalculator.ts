@@ -8,10 +8,10 @@ export async function calculateDailyBudget(): Promise<BudgetCalculation> {
   const accounts = await getAccounts()
   const transactions = await getTransactions()
   const upcomingTransactions = await getUpcomingTransactions()
-  const setup = getMonthlySetup()
+  const setup = await getMonthlySetup()
 
   // If no setup or new month, return default values (will trigger setup)
-  if (!setup || isNewMonth()) {
+  if (!setup || await isNewMonth()) {
     return {
       dailyAvailable: 0,
       monthlyAvailable: 0,
