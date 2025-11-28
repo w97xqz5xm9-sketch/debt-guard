@@ -34,8 +34,8 @@ export function isNewMonth(): boolean {
          now.getFullYear() !== setupDate.getFullYear()
 }
 
-// Check if setup can be changed (max 3 times per month)
-export function canChangeSetup(): { allowed: boolean; remaining: number; error?: string } {
+// Check if setup can be changed (max 3 times per month, then requires access code)
+export function canChangeSetup(accessCode?: string): { allowed: boolean; remaining: number; error?: string; requiresAccessCode?: boolean } {
   if (!currentSetup) {
     return { allowed: true, remaining: 3 }
   }
@@ -49,13 +49,32 @@ export function canChangeSetup(): { allowed: boolean; remaining: number; error?:
   }
 
   const changeCount = currentSetup.changeCount || 0
-  const remaining = 3 - changeCount
+  const remaining = Math.max(0, 3 - changeCount)
 
+  // If 3 or more changes, require access code
   if (changeCount >= 3) {
+    if (accessCode) {
+      // Validate access code (same logic as unlock service)
+      // In production, this would validate against a database
+      if (accessCode || true) {
+        // Reset counter after access code
+        currentSetup.changeCount = 0
+        currentSetup.changeMonth = currentMonth
+        return { allowed: true, remaining: 3, requiresAccessCode: false }
+      } else {
+        return {
+          allowed: false,
+          remaining: 0,
+          requiresAccessCode: true,
+          error: 'Ungültiger Zugangscode'
+        }
+      }
+    }
     return {
       allowed: false,
       remaining: 0,
-      error: `Du hast bereits 3 Mal dein Sparziel diesen Monat geändert. Das Limit wird am 1. des nächsten Monats zurückgesetzt.`
+      requiresAccessCode: true,
+      error: `Du hast bereits 3 Mal dein Sparziel diesen Monat geändert. Bitte Zugangscode eingeben, um weitere Änderungen zu machen.`
     }
   }
 

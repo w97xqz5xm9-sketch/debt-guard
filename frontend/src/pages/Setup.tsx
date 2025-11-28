@@ -39,7 +39,9 @@ export default function Setup({ onComplete }: SetupProps) {
   const [monthlyIncome, setMonthlyIncome] = useState('3000')
   const [loading, setLoading] = useState(false)
   const [currentSetup, setCurrentSetup] = useState<any>(null)
-  const [changeInfo, setChangeInfo] = useState<{ remaining: number; canChange: boolean } | null>(null)
+  const [changeInfo, setChangeInfo] = useState<{ remaining: number; canChange: boolean; requiresAccessCode?: boolean } | null>(null)
+  const [showAccessCodeInput, setShowAccessCodeInput] = useState(false)
+  const [accessCode, setAccessCode] = useState('')
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -56,6 +58,9 @@ export default function Setup({ onComplete }: SetupProps) {
         setMonthlyIncome(response.setup.monthlyIncome.toString())
         if (response.changeInfo) {
           setChangeInfo(response.changeInfo)
+          if (response.changeInfo.requiresAccessCode) {
+            setShowAccessCodeInput(true)
+          }
         }
       } else if (response.needsSetup) {
         // No setup exists, this is initial setup
@@ -146,26 +151,20 @@ export default function Setup({ onComplete }: SetupProps) {
             </p>
             {currentSetup && changeInfo && (
               <div className="mt-2">
-                {changeInfo.canChange ? (
+                {changeInfo.canChange && !changeInfo.requiresAccessCode ? (
                   <p className="text-sm text-gray-500">
                     Noch {changeInfo.remaining} Änderung{changeInfo.remaining !== 1 ? 'en' : ''} diesen Monat möglich
                   </p>
-                ) : (
+                ) : changeInfo.requiresAccessCode ? (
                   <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
                     <p className="text-sm text-yellow-800 font-medium">
                       ⚠️ Limit erreicht: Du hast bereits 3 Mal dein Sparziel diesen Monat geändert.
                     </p>
                     <p className="text-xs text-yellow-700 mt-1">
-                      Das Limit wird am 1. des nächsten Monats zurückgesetzt. Du kannst die App weiterhin normal nutzen.
+                      Gib einen Zugangscode ein, um weitere Änderungen zu machen.
                     </p>
-                    <button
-                      onClick={() => navigate('/')}
-                      className="mt-3 w-full btn-primary text-sm"
-                    >
-                      Zurück zum Dashboard
-                    </button>
                   </div>
-                )}
+                ) : null}
               </div>
             )}
           </div>
@@ -207,6 +206,25 @@ export default function Setup({ onComplete }: SetupProps) {
               Wird automatisch aus deinen Transaktionen erkannt, falls nicht angegeben
             </p>
           </div>
+
+          {/* Access Code Input */}
+          {(showAccessCodeInput || (changeInfo && changeInfo.requiresAccessCode)) && (
+            <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+              <label className="block text-sm font-medium text-yellow-900 mb-2">
+                Zugangscode (erforderlich)
+              </label>
+              <input
+                type="text"
+                value={accessCode}
+                onChange={(e) => setAccessCode(e.target.value)}
+                className="w-full px-4 py-2 border border-yellow-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                placeholder="Zugangscode eingeben"
+              />
+              <p className="text-xs text-yellow-700 mt-1">
+                Du hast bereits 3 Mal dein Sparziel geändert. Gib einen Zugangscode ein, um weitere Änderungen zu machen.
+              </p>
+            </div>
+          )}
 
           {(!currentSetup || (changeInfo && changeInfo.canChange)) && (
             <button

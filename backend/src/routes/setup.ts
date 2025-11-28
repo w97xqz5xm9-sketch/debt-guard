@@ -53,12 +53,14 @@ router.post('/', async (req, res) => {
     // Check if setup already exists (this is a change, not initial setup)
     const existingSetup = getMonthlySetup()
     if (existingSetup && !isNewMonth()) {
-      // Check if user can change setup (max 3 times per month)
-      const changeCheck = canChangeSetup()
+      // Check if user can change setup (max 3 times per month, then requires access code)
+      const { accessCode } = req.body
+      const changeCheck = canChangeSetup(accessCode)
       if (!changeCheck.allowed) {
         return res.status(403).json({
           error: changeCheck.error || 'Du hast bereits 3 Mal dein Sparziel diesen Monat geändert.',
-          remaining: changeCheck.remaining
+          remaining: changeCheck.remaining,
+          requiresAccessCode: changeCheck.requiresAccessCode
         })
       }
     }
@@ -83,9 +85,16 @@ router.post('/', async (req, res) => {
     let changeMonth = currentMonth
     
     if (existingSetup && !isNewMonth()) {
-      // This is a change, increment counter
-      incrementChangeCount()
-      changeCount = (existingSetup.changeCount || 0) + 1
+      // This is a change, increment counter (unless access code was used)
+      const { accessCode } = req.body
+      if (accessCode && (existingSetup.changeCount || 0) >= 3) {
+        // Access code was used, reset counter
+        changeCount = 1
+      } else {
+        // Normal change, increment counter
+        incrementChangeCount()
+        changeCount = (existingSetup.changeCount || 0) + 1
+      }
       changeMonth = existingSetup.changeMonth || currentMonth
     } else {
       // This is initial setup or new month
