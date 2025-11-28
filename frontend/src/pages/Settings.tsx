@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { CreditCard, Bell, Lock, Unlock } from 'lucide-react'
 import { budgetApi } from '../services/api'
 import type { Account, SpendingBehavior } from '../types'
