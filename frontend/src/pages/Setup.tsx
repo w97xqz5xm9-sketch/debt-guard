@@ -70,6 +70,24 @@ export default function Setup({ onComplete }: SetupProps) {
   const handleSubmit = async () => {
     if (!savingsGoal) return
 
+    // Show remaining changes before submitting (if this is a change, not initial setup)
+    if (currentSetup && changeInfo) {
+      if (!changeInfo.canChange) {
+        alert('Du hast bereits 3 Mal dein Sparziel diesen Monat geändert. Bitte einen neuen Code anfragen, um weitere Änderungen zu machen.')
+        return
+      }
+      const remaining = changeInfo.remaining
+      if (remaining === 2) {
+        if (!confirm(`Du hast noch 2 Änderungen diesen Monat möglich.\n\nMöchtest du fortfahren?`)) {
+          return
+        }
+      } else if (remaining === 1) {
+        if (!confirm(`Du hast noch 1 Änderung diesen Monat möglich.\n\nNach dieser Änderung musst du einen neuen Code anfragen.\n\nMöchtest du fortfahren?`)) {
+          return
+        }
+      }
+    }
+
     setLoading(true)
     try {
       const response = await budgetApi.saveSetup({
@@ -77,28 +95,22 @@ export default function Setup({ onComplete }: SetupProps) {
         monthlyIncome: parseFloat(monthlyIncome) || 3000,
       })
       
-      // Show success message with remaining changes
+      // Show success message
       if (currentSetup) {
-        // This is a change, show remaining changes
+        // This is a change
         if (response.changeInfo) {
           const remaining = response.changeInfo.remaining
           if (remaining > 0) {
-            alert(`✅ Setup erfolgreich geändert!\n\nDu hast noch ${remaining} Änderung${remaining !== 1 ? 'en' : ''} diesen Monat möglich.`)
+            alert(`✅ Setup erfolgreich geändert!`)
           } else {
-            alert('✅ Setup erfolgreich geändert!\n\nDu hast dein Limit von 3 Änderungen diesen Monat erreicht. Das Limit wird am 1. des nächsten Monats zurückgesetzt.')
+            alert('✅ Setup erfolgreich geändert!\n\nDu hast dein Limit von 3 Änderungen diesen Monat erreicht. Bitte einen neuen Code anfragen, um weitere Änderungen zu machen.')
           }
         } else {
-          // Fallback if changeInfo is not in response
           alert('✅ Setup erfolgreich geändert!')
         }
       } else {
         // Initial setup
-        if (response.changeInfo) {
-          const remaining = response.changeInfo.remaining
-          alert(`✅ Setup erfolgreich erstellt!\n\nDu hast noch ${remaining} Änderung${remaining !== 1 ? 'en' : ''} diesen Monat möglich.`)
-        } else {
-          alert('✅ Setup erfolgreich erstellt!')
-        }
+        alert('✅ Setup erfolgreich erstellt!')
       }
       
       // Reload setup info to get updated change info
@@ -122,7 +134,7 @@ export default function Setup({ onComplete }: SetupProps) {
         if (error.response.data?.remaining !== undefined) {
           const remaining = error.response.data.remaining
           if (remaining === 0) {
-            errorMessage = 'Du hast bereits 3 Mal dein Sparziel diesen Monat geändert. Das Limit wird am 1. des nächsten Monats zurückgesetzt.'
+            errorMessage = 'Du hast bereits 3 Mal dein Sparziel diesen Monat geändert. Bitte einen neuen Code anfragen, um weitere Änderungen zu machen.'
           }
         }
       } else if (error.request) {
@@ -159,7 +171,7 @@ export default function Setup({ onComplete }: SetupProps) {
                   </p>
                 ) : (
                   <p className="text-sm text-yellow-600">
-                    ⚠️ Limit erreicht: Du hast bereits 3 Mal dein Sparziel diesen Monat geändert. Das Limit wird am 1. des nächsten Monats zurückgesetzt.
+                    ⚠️ Limit erreicht: Du hast bereits 3 Mal dein Sparziel diesen Monat geändert. Bitte einen neuen Code anfragen, um weitere Änderungen zu machen.
                   </p>
                 )}
               </div>
@@ -219,7 +231,7 @@ export default function Setup({ onComplete }: SetupProps) {
           {changeInfo && !changeInfo.canChange && (
             <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
               <p className="text-sm text-yellow-800">
-                Du hast dein Limit von 3 Änderungen diesen Monat erreicht. Du kannst die App weiterhin normal nutzen. Das Limit wird am 1. des nächsten Monats zurückgesetzt.
+                Du hast dein Limit von 3 Änderungen diesen Monat erreicht. Bitte einen neuen Code anfragen, um weitere Änderungen zu machen.
               </p>
               <button
                 onClick={() => navigate('/')}

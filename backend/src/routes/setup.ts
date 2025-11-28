@@ -57,7 +57,7 @@ router.post('/', async (req, res) => {
       const changeCheck = await canChangeSetup()
       if (!changeCheck.allowed) {
         return res.status(403).json({
-          error: 'Du hast bereits 3 Mal dein Sparziel diesen Monat geändert. Das Limit wird am 1. des nächsten Monats zurückgesetzt.',
+          error: 'Du hast bereits 3 Mal dein Sparziel diesen Monat geändert. Bitte einen neuen Code anfragen, um weitere Änderungen zu machen.',
           remaining: 0
         })
       }
