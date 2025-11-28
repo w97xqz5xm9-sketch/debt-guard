@@ -208,31 +208,35 @@ export default function Setup({ onComplete }: SetupProps) {
             </p>
           </div>
 
-          <button
-            onClick={handleSubmit}
-            disabled={!savingsGoal || loading || (currentSetup && changeInfo && !changeInfo.canChange)}
-            className={`w-full py-3 text-lg font-medium rounded-lg transition-colors ${
-              !savingsGoal || loading || (currentSetup && changeInfo && !changeInfo.canChange)
-                ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                : 'bg-primary-600 text-white hover:bg-primary-700'
-            }`}
-          >
-            {loading ? 'Wird erstellt...' : currentSetup ? 'Setup ändern' : 'Setup starten'}
-          </button>
+          {(!currentSetup || (changeInfo && changeInfo.canChange)) && (
+            <button
+              onClick={handleSubmit}
+              disabled={!savingsGoal || loading}
+              className={`w-full py-3 text-lg font-medium rounded-lg transition-colors ${
+                !savingsGoal || loading
+                  ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                  : 'bg-primary-600 text-white hover:bg-primary-700'
+              }`}
+            >
+              {loading ? 'Wird erstellt...' : currentSetup ? 'Setup ändern' : 'Setup starten'}
+            </button>
+          )}
           
           {currentSetup && changeInfo && !changeInfo.canChange && (
-            <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-              <p className="text-sm text-yellow-900 font-medium mb-2">
-                ⚠️ Limit erreicht
-              </p>
-              <p className="text-sm text-yellow-800">
-                Du hast bereits 3 Mal dein Sparziel diesen Monat geändert. Das Limit wird am 1. des nächsten Monats zurückgesetzt.
-              </p>
+            <div className="space-y-3">
+              <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                <p className="text-sm text-yellow-900 font-medium mb-2">
+                  ⚠️ Limit erreicht
+                </p>
+                <p className="text-sm text-yellow-800">
+                  Du hast bereits 3 Mal dein Sparziel diesen Monat geändert. Das Limit wird am 1. des nächsten Monats zurückgesetzt.
+                </p>
+              </div>
               <button
                 onClick={() => navigate('/')}
-                className="mt-3 w-full btn-primary text-sm"
+                className="w-full btn-primary"
               >
-                Zurück zur App
+                Zurück zum Dashboard
               </button>
             </div>
           )}
