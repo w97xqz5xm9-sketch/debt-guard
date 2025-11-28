@@ -78,15 +78,27 @@ export default function Setup({ onComplete }: SetupProps) {
       })
       
       // Show success message with remaining changes
-      if (currentSetup && response.changeInfo) {
-        const remaining = response.changeInfo.remaining
-        if (remaining > 0) {
-          alert(`✅ Setup erfolgreich geändert!\n\nDu hast noch ${remaining} Änderung${remaining !== 1 ? 'en' : ''} diesen Monat möglich.`)
+      if (currentSetup) {
+        // This is a change, show remaining changes
+        if (response.changeInfo) {
+          const remaining = response.changeInfo.remaining
+          if (remaining > 0) {
+            alert(`✅ Setup erfolgreich geändert!\n\nDu hast noch ${remaining} Änderung${remaining !== 1 ? 'en' : ''} diesen Monat möglich.`)
+          } else {
+            alert('✅ Setup erfolgreich geändert!\n\nDu hast dein Limit von 3 Änderungen diesen Monat erreicht. Das Limit wird am 1. des nächsten Monats zurückgesetzt.')
+          }
         } else {
-          alert('✅ Setup erfolgreich geändert!\n\nDu hast dein Limit von 3 Änderungen diesen Monat erreicht. Das Limit wird am 1. des nächsten Monats zurückgesetzt.')
+          // Fallback if changeInfo is not in response
+          alert('✅ Setup erfolgreich geändert!')
         }
-      } else if (!currentSetup) {
-        alert('✅ Setup erfolgreich erstellt!')
+      } else {
+        // Initial setup
+        if (response.changeInfo) {
+          const remaining = response.changeInfo.remaining
+          alert(`✅ Setup erfolgreich erstellt!\n\nDu hast noch ${remaining} Änderung${remaining !== 1 ? 'en' : ''} diesen Monat möglich.`)
+        } else {
+          alert('✅ Setup erfolgreich erstellt!')
+        }
       }
       
       // Reload setup info to get updated change info
