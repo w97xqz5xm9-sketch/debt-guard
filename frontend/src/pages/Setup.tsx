@@ -57,21 +57,29 @@ export default function Setup({ onComplete }: SetupProps) {
         setSavingsGoal(response.setup.savingsGoal)
         setMonthlyIncome(response.setup.monthlyIncome.toString())
         if (response.changeInfo) {
-          setChangeInfo(response.changeInfo)
+          setChangeInfo({
+            remaining: response.changeInfo.remaining,
+            canChange: response.changeInfo.canChange,
+            requiresAccessCode: response.changeInfo.requiresAccessCode || false
+          })
           if (response.changeInfo.requiresAccessCode) {
             setShowAccessCodeInput(true)
+          } else {
+            setShowAccessCodeInput(false)
           }
         }
       } else if (response.needsSetup) {
         // No setup exists, this is initial setup
         setCurrentSetup(null)
         setChangeInfo(null)
+        setShowAccessCodeInput(false)
       }
     } catch (error) {
       console.error('Error loading current setup:', error)
       // On error, assume no setup exists
       setCurrentSetup(null)
       setChangeInfo(null)
+      setShowAccessCodeInput(false)
     }
   }
 
@@ -146,6 +154,9 @@ export default function Setup({ onComplete }: SetupProps) {
       // Don't show alert if access code is required - the UI already shows it
       if (!error.response?.data?.requiresAccessCode) {
         alert(`${errorMessage}\n\nBitte öffne die Browser-Konsole (F12) für mehr Details.`)
+      } else {
+        // Just reload the setup to show the access code input
+        await loadCurrentSetup()
       }
     } finally {
       setLoading(false)
