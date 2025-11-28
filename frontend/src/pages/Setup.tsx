@@ -137,9 +137,28 @@ export default function Setup({ onComplete }: SetupProps) {
               {currentSetup ? 'Ändere dein Sparziel oder Einkommen' : 'Wähle dein Sparziel für diesen Monat'}
             </p>
             {currentSetup && changeInfo && (
-              <p className="text-sm text-gray-500 mt-2">
-                Noch {changeInfo.remaining} Änderung{changeInfo.remaining !== 1 ? 'en' : ''} diesen Monat möglich
-              </p>
+              <div className="mt-2">
+                {changeInfo.canChange ? (
+                  <p className="text-sm text-gray-500">
+                    Noch {changeInfo.remaining} Änderung{changeInfo.remaining !== 1 ? 'en' : ''} diesen Monat möglich
+                  </p>
+                ) : (
+                  <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                    <p className="text-sm text-yellow-800 font-medium">
+                      ⚠️ Limit erreicht: Du hast bereits 3 Mal dein Sparziel diesen Monat geändert.
+                    </p>
+                    <p className="text-xs text-yellow-700 mt-1">
+                      Das Limit wird am 1. des nächsten Monats zurückgesetzt. Du kannst die App weiterhin normal nutzen.
+                    </p>
+                    <a
+                      href="/"
+                      className="text-sm text-primary-600 hover:underline mt-2 inline-block"
+                    >
+                      Zurück zum Dashboard →
+                    </a>
+                  </div>
+                )}
+              </div>
             )}
           </div>
 
