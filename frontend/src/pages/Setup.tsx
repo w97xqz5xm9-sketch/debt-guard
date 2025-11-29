@@ -81,11 +81,12 @@ export default function Setup({ onComplete }: SetupProps) {
         if (!confirm(`Du hast noch 1 Änderung diesen Monat möglich.\n\nMöchtest du fortfahren?`)) {
           return
         }
+      }
     }
 
     setLoading(true)
     try {
-      const response = await budgetApi.saveSetup({
+      await budgetApi.saveSetup({
         savingsGoal,
         monthlyIncome: parseFloat(monthlyIncome) || 3000,
       })
