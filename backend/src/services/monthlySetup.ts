@@ -106,7 +106,7 @@ export async function isNewMonth(): Promise<boolean> {
          now.getFullYear() !== setupDate.getFullYear()
 }
 
-// Check if setup can be changed (max 3 times per month)
+// Check if setup can be changed (max 3 times per month, then resets)
 export async function canChangeSetup(): Promise<{ allowed: boolean; remaining: number }> {
   const setup = await getMonthlySetup()
   if (!setup) {
@@ -124,10 +124,8 @@ export async function canChangeSetup(): Promise<{ allowed: boolean; remaining: n
   const changeCount = setup.changeCount || 0
   const remaining = Math.max(0, 3 - changeCount)
 
-  if (changeCount >= 3) {
-    return { allowed: false, remaining: 0 }
-  }
-
+  // Always allow changes, but show remaining count
+  // After 3 changes, counter resets automatically
   return { allowed: true, remaining }
 }
 
@@ -144,7 +142,13 @@ export async function incrementChangeCount(): Promise<void> {
     setup.changeCount = 1
     setup.changeMonth = currentMonth
   } else {
-    setup.changeCount = (setup.changeCount || 0) + 1
+    const newCount = (setup.changeCount || 0) + 1
+    // If we reach 3, reset to 1 (start over)
+    if (newCount >= 3) {
+      setup.changeCount = 1
+    } else {
+      setup.changeCount = newCount
+    }
   }
 
   // Save updated setup

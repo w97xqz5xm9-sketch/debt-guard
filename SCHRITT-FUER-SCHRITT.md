@@ -191,3 +191,4 @@ Wenn etwas nicht funktioniert:
 3. Prüfe, ob die Environment Variables gesetzt sind
 4. Warte noch ein paar Minuten (manchmal dauert es länger)
 
+

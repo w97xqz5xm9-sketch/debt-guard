@@ -162,3 +162,4 @@ Deine App ist jetzt dauerhaft online:
 - Prüfe die Logs im Render Dashboard
 - Stelle sicher, dass alle Commands korrekt sind
 
+

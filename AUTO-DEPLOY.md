@@ -101,3 +101,4 @@ git push
 - Prüfe die Logs für Fehlermeldungen
 - Prüfe, ob der Code kompiliert (TypeScript-Fehler?)
 
+

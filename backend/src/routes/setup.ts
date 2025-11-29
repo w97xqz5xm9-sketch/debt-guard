@@ -52,16 +52,8 @@ router.post('/', async (req, res) => {
 
     const existingSetup = await getMonthlySetup()
     
-    // Check if this is a change (not initial setup)
-    if (existingSetup && !(await isNewMonth())) {
-      const changeCheck = await canChangeSetup()
-      if (!changeCheck.allowed) {
-        return res.status(403).json({
-          error: 'Du hast bereits 3 Mal dein Sparziel diesen Monat geändert. Bitte einen neuen Code anfragen, um weitere Änderungen zu machen.',
-          remaining: 0
-        })
-      }
-    }
+    // No blocking check - always allow changes
+    // Counter will reset automatically after 3 changes
 
     const transactions = await getTransactions()
     const upcoming = await getUpcomingTransactions()

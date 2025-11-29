@@ -116,3 +116,4 @@ Wenn `DATABASE_URL` nicht gesetzt ist, verwendet die App automatisch In-Memory-S
 - Stelle sicher, dass der Datenbank-User CREATE TABLE Rechte hat
 - Starte den Backend-Service neu
 
+

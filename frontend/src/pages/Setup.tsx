@@ -70,19 +70,20 @@ export default function Setup({ onComplete }: SetupProps) {
   const handleSubmit = async () => {
     if (!savingsGoal) return
 
-    // Show remaining changes before submitting (if this is a change, not initial setup)
+    // Show remaining changes info (if this is a change, not initial setup)
     if (currentSetup && changeInfo) {
-      if (!changeInfo.canChange) {
-        alert('Du hast bereits 3 Mal dein Sparziel diesen Monat geändert. Bitte einen neuen Code anfragen, um weitere Änderungen zu machen.')
-        return
-      }
       const remaining = changeInfo.remaining
       if (remaining === 2) {
         if (!confirm(`Du hast noch 2 Änderungen diesen Monat möglich.\n\nMöchtest du fortfahren?`)) {
           return
         }
       } else if (remaining === 1) {
-        if (!confirm(`Du hast noch 1 Änderung diesen Monat möglich.\n\nNach dieser Änderung musst du einen neuen Code anfragen.\n\nMöchtest du fortfahren?`)) {
+        if (!confirm(`Du hast noch 1 Änderung diesen Monat möglich.\n\nMöchtest du fortfahren?`)) {
+          return
+        }
+      } else if (remaining === 0) {
+        // After 3 changes, show OK message and reset
+        if (!confirm(`✅ Setup wird geändert!\n\nDer Zähler wird zurückgesetzt und du kannst wieder 3 Änderungen vornehmen.\n\nOK?`)) {
           return
         }
       }
@@ -100,10 +101,10 @@ export default function Setup({ onComplete }: SetupProps) {
         // This is a change
         if (response.changeInfo) {
           const remaining = response.changeInfo.remaining
-          if (remaining > 0) {
-            alert(`✅ Setup erfolgreich geändert!`)
+          if (remaining === 0) {
+            alert('✅ Setup erfolgreich geändert!\n\nDer Zähler wurde zurückgesetzt. Du kannst wieder 3 Änderungen vornehmen.')
           } else {
-            alert('✅ Setup erfolgreich geändert!\n\nDu hast dein Limit von 3 Änderungen diesen Monat erreicht. Bitte einen neuen Code anfragen, um weitere Änderungen zu machen.')
+            alert(`✅ Setup erfolgreich geändert!`)
           }
         } else {
           alert('✅ Setup erfolgreich geändert!')
@@ -131,12 +132,6 @@ export default function Setup({ onComplete }: SetupProps) {
       
       if (error.response) {
         errorMessage = error.response.data?.error || `Server-Fehler: ${error.response.status}`
-        if (error.response.data?.remaining !== undefined) {
-          const remaining = error.response.data.remaining
-          if (remaining === 0) {
-            errorMessage = 'Du hast bereits 3 Mal dein Sparziel diesen Monat geändert. Bitte einen neuen Code anfragen, um weitere Änderungen zu machen.'
-          }
-        }
       } else if (error.request) {
         errorMessage = 'Keine Verbindung zum Backend. Bitte prüfe die Backend-URL in den Render-Einstellungen.'
       } else {
@@ -165,13 +160,13 @@ export default function Setup({ onComplete }: SetupProps) {
             </p>
             {currentSetup && changeInfo && (
               <div className="mt-2">
-                {changeInfo.canChange ? (
-                  <p className="text-sm text-gray-500">
-                    Noch {changeInfo.remaining} Änderung{changeInfo.remaining !== 1 ? 'en' : ''} diesen Monat möglich
+                {changeInfo.remaining === 0 ? (
+                  <p className="text-sm text-blue-600">
+                    ⚠️ Du hast 3 Änderungen erreicht. Nach dieser Änderung wird der Zähler zurückgesetzt.
                   </p>
                 ) : (
-                  <p className="text-sm text-yellow-600">
-                    ⚠️ Limit erreicht: Du hast bereits 3 Mal dein Sparziel diesen Monat geändert. Bitte einen neuen Code anfragen, um weitere Änderungen zu machen.
+                  <p className="text-sm text-gray-500">
+                    Noch {changeInfo.remaining} Änderung{changeInfo.remaining !== 1 ? 'en' : ''} diesen Monat möglich
                   </p>
                 )}
               </div>
@@ -218,29 +213,15 @@ export default function Setup({ onComplete }: SetupProps) {
 
           <button
             onClick={handleSubmit}
-            disabled={!savingsGoal || loading || (changeInfo !== null && !changeInfo.canChange)}
+            disabled={!savingsGoal || loading}
             className={`w-full py-3 text-lg font-medium rounded-lg transition-colors ${
-              !savingsGoal || loading || (changeInfo !== null && !changeInfo.canChange)
+              !savingsGoal || loading
                 ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                 : 'bg-primary-600 text-white hover:bg-primary-700'
             }`}
           >
             {loading ? 'Wird erstellt...' : currentSetup ? 'Setup ändern' : 'Setup starten'}
           </button>
-          
-          {changeInfo && !changeInfo.canChange && (
-            <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-              <p className="text-sm text-yellow-800">
-                Du hast dein Limit von 3 Änderungen diesen Monat erreicht. Bitte einen neuen Code anfragen, um weitere Änderungen zu machen.
-              </p>
-              <button
-                onClick={() => navigate('/')}
-                className="mt-3 w-full py-2 text-sm font-medium rounded-lg bg-primary-600 text-white hover:bg-primary-700 transition-colors"
-              >
-                Zurück zum Dashboard
-              </button>
-            </div>
-          )}
           
           {!savingsGoal && (
             <p className="text-sm text-danger-600 mt-2 text-center">

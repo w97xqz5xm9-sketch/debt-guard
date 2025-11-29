@@ -89,3 +89,4 @@ Das Frontend kann das Backend nicht erreichen. Hier ist die Lösung:
 3. Kopiere die Fehlermeldung aus der Konsole
 4. Prüfe die Network-Tab (F12 → Network) für fehlgeschlagene Requests
 
+

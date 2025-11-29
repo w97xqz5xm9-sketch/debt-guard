@@ -54,3 +54,4 @@ Beim Erstellen des Frontends musst du **1 Environment Variable** hinzufügen:
 
 - [ ] `VITE_API_URL` = `https://dein-backend-url.onrender.com/api`
 
+

@@ -14,3 +14,4 @@ cd backend && NODE_ENV=development npm install && npm run build
 
 Das stellt sicher, dass @types/node installiert wird.
 
+
