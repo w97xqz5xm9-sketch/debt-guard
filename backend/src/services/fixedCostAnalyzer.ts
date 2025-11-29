@@ -178,7 +178,7 @@ export function analyzeFixedCosts(transactions: Transaction[], upcomingTransacti
       confidence: 0.3,
       lastOccurrence: new Date().toISOString(),
       nextDueDate: undefined,
-      source: 'ai',
+      source: 'estimated',
     }))
     total = DEFAULT_FIXED_COSTS.reduce((sum, cost) => sum + cost.amount, 0)
   }

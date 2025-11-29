@@ -158,7 +158,7 @@ export default function Budget() {
                         ? 'Bevorstehend'
                         : cost.source === 'history'
                         ? 'Historisch erkannt'
-                        : 'KI-Schätzung'}
+                        : 'geschätzt'}
                     </p>
                   </div>
                   <div className="text-right">

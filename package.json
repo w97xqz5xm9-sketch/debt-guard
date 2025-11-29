@@ -1,7 +1,7 @@
 {
   "name": "debt-guard",
   "version": "1.0.0",
-  "description": "Die erste KI-App, die dich vor dem Überschulden schützt",
+  "description": "Die App, die dich vor dem Überschulden schützt",
   "private": true,
   "workspaces": [
     "frontend",

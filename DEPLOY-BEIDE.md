@@ -163,3 +163,4 @@ Deine App ist jetzt dauerhaft online:
 - Stelle sicher, dass alle Commands korrekt sind
 
 
+

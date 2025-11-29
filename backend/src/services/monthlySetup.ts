@@ -5,7 +5,7 @@ import { query } from './database'
 // Monthly setup service - handles month start configuration
 export interface MonthlySetup {
   savingsGoal: number // selectable tier from setup UI
-  fixedCosts: number // AI-calculated fixed costs
+  fixedCosts: number // Automatically calculated fixed costs
   monthlyIncome: number
   variableBudget: number // What can be spent variably
   dailyLimit: number // Daily spending limit

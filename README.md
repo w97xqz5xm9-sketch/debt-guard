@@ -1,6 +1,6 @@
 # Debt Guard 🛡️
 
-**Die erste KI-App, die dich vor dem Überschulden schützt**
+**Die App, die dich vor dem Überschulden schützt**
 
 ## Problem
 
@@ -10,7 +10,7 @@ Wir leben in der verschuldetsten Generation aller Zeiten. Bestehende Budget-Apps
 
 Debt Guard ist die erste App, die nicht nur Ausgaben trackt – sie greift aktiv ein, bevor Schaden entsteht.
 
-Unsere KI berechnet das tägliche verfügbare Budget fortlaufend neu, basierend auf:
+Die App berechnet das tägliche verfügbare Budget fortlaufend neu, basierend auf:
 - Kontostand
 - Gehalts- und Zahlungseingängen
 - bevorstehenden Abbuchungen
@@ -21,7 +21,7 @@ Wenn ein Kauf das Tagesbudget sprengen würde, kann die App die Zahlung automati
 
 ## Kernfunktionen
 
-- ✅ KI-gestützte Echtzeit-Budgetberechnung (dynamischer Tagesbetrag)
+- ✅ Automatische Echtzeit-Budgetberechnung (dynamischer Tagesbetrag)
 - ✅ Automatische Ausgabensperre, bevor man zu viel ausgibt
 - ✅ Impulse-Control-Mechanismen gegen Spontankäufe
 - ✅ Proaktive Benachrichtigungen und klare Tageslimits
@@ -39,7 +39,6 @@ Im Gegensatz zu Apps wie Finanzguru, N26-Spaces, YNAB oder Mint ist Debt Guard:
 
 - **Frontend**: React + TypeScript + Tailwind CSS
 - **Backend**: Node.js + Express + TypeScript
-- **AI/ML**: Python-basierte Budgetberechnung und Verhaltensanalyse
 
 ## Installation
 
@@ -60,8 +59,7 @@ Dies startet sowohl Frontend als auch Backend gleichzeitig.
 ```
 debt-guard/
 ├── frontend/          # React Frontend
-├── backend/           # Node.js Backend API
-└── ai-module/         # Python AI/ML Module
+└── backend/           # Node.js Backend API
 ```
 
 ## App teilen

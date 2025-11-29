@@ -102,3 +102,4 @@ git push
 - Prüfe, ob der Code kompiliert (TypeScript-Fehler?)
 
 
+

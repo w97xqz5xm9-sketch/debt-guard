@@ -23,7 +23,7 @@
 ### Kernprinzipien:
 - **Proaktiv**: Blockiert Ausgaben bevor sie getätigt werden
 - **Dynamisch**: Budget wird täglich neu berechnet
-- **Intelligent**: KI-basierte Fixkostenerkennung
+- **Intelligent**: Automatische Fixkostenerkennung
 - **Persistent**: Daten werden in PostgreSQL gespeichert
 
 ---
@@ -948,4 +948,5 @@ app.use(cors({
 - [PostgreSQL Dokumentation](https://www.postgresql.org/docs/)
 - [TypeScript Dokumentation](https://www.typescriptlang.org/docs/)
 - [Render.com Dokumentation](https://render.com/docs)
+
 

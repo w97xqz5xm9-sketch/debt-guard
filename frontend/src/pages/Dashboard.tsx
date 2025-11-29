@@ -154,7 +154,7 @@ export default function Dashboard() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="card">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-sm font-medium text-gray-600">Fixkosten (AI-berechnet)</h3>
+            <h3 className="text-sm font-medium text-gray-600">Fixkosten (automatisch berechnet)</h3>
             <TrendingDown className="h-5 w-5 text-danger-500" />
           </div>
           <p className="text-2xl font-bold text-gray-900">
@@ -172,7 +172,7 @@ export default function Dashboard() {
                     <p className="text-xs text-gray-500">
                       {cost.frequency === 'irregular' ? 'Unregelmäßig' : cost.frequency === 'bi-weekly' ? '14-tägig' : cost.frequency === 'weekly' ? 'Wöchentlich' : 'Monatlich'}
                       {' • '}
-                      {cost.source === 'upcoming' ? 'bevorstehend' : cost.source === 'history' ? 'erkannt' : 'KI-Schätzung'}
+                      {cost.source === 'upcoming' ? 'bevorstehend' : cost.source === 'history' ? 'erkannt' : 'geschätzt'}
                     </p>
                   </div>
                   <div className="text-right">
@@ -236,11 +236,11 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* AI Recommendations */}
+      {/* Recommendations */}
       {calculation.recommendations.length > 0 && (
         <div className="card bg-primary-50 border-primary-200">
           <h2 className="text-lg font-semibold mb-4 text-primary-900">
-            KI-Empfehlungen
+            Empfehlungen
           </h2>
           <ul className="space-y-2">
             {calculation.recommendations.map((rec, index) => (

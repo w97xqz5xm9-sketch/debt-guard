@@ -62,7 +62,7 @@ export interface FixedCostInsight {
   confidence: number // 0-1
   lastOccurrence: string
   nextDueDate?: string
-  source: 'history' | 'upcoming' | 'ai'
+  source: 'history' | 'upcoming' | 'estimated'
 }
 
 export interface FixedCostAnalysis {

@@ -23,7 +23,7 @@ export async function calculateDailyBudget(): Promise<BudgetCalculation> {
     }
   }
 
-  // Calculate fixed costs using AI analysis
+  // Calculate fixed costs using automatic analysis
   const { total: fixedCosts, insights: fixedCostInsights } = analyzeFixedCosts(transactions, upcomingTransactions)
   
   // Calculate monthly income from transaction history
