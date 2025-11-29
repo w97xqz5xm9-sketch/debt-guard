@@ -81,12 +81,6 @@ export default function Setup({ onComplete }: SetupProps) {
         if (!confirm(`Du hast noch 1 Änderung diesen Monat möglich.\n\nMöchtest du fortfahren?`)) {
           return
         }
-      } else if (remaining === 0) {
-        // After 3 changes, show OK message and reset
-        if (!confirm(`✅ Setup wird geändert!\n\nDer Zähler wird zurückgesetzt und du kannst wieder 3 Änderungen vornehmen.\n\nOK?`)) {
-          return
-        }
-      }
     }
 
     setLoading(true)
@@ -98,17 +92,7 @@ export default function Setup({ onComplete }: SetupProps) {
       
       // Show success message
       if (currentSetup) {
-        // This is a change
-        if (response.changeInfo) {
-          const remaining = response.changeInfo.remaining
-          if (remaining === 0) {
-            alert('✅ Setup erfolgreich geändert!\n\nDer Zähler wurde zurückgesetzt. Du kannst wieder 3 Änderungen vornehmen.')
-          } else {
-            alert(`✅ Setup erfolgreich geändert!`)
-          }
-        } else {
-          alert('✅ Setup erfolgreich geändert!')
-        }
+        alert('✅ Setup erfolgreich geändert!')
       } else {
         // Initial setup
         alert('✅ Setup erfolgreich erstellt!')
@@ -158,17 +142,11 @@ export default function Setup({ onComplete }: SetupProps) {
             <p className="text-gray-600">
               {currentSetup ? 'Ändere dein Sparziel oder Einkommen' : 'Wähle dein Sparziel für diesen Monat'}
             </p>
-            {currentSetup && changeInfo && (
+            {currentSetup && changeInfo && changeInfo.remaining > 0 && (
               <div className="mt-2">
-                {changeInfo.remaining === 0 ? (
-                  <p className="text-sm text-blue-600">
-                    ⚠️ Du hast 3 Änderungen erreicht. Nach dieser Änderung wird der Zähler zurückgesetzt.
-                  </p>
-                ) : (
-                  <p className="text-sm text-gray-500">
-                    Noch {changeInfo.remaining} Änderung{changeInfo.remaining !== 1 ? 'en' : ''} diesen Monat möglich
-                  </p>
-                )}
+                <p className="text-sm text-gray-500">
+                  Noch {changeInfo.remaining} Änderung{changeInfo.remaining !== 1 ? 'en' : ''} diesen Monat möglich
+                </p>
               </div>
             )}
           </div>
