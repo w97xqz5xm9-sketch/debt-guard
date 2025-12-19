@@ -1,5 +1,5 @@
 import express from 'express'
-import { getTransactions, addTransaction } from '../services/dataService'
+import { getTransactions, addTransaction, deleteAllTransactions } from '../services/dataService'
 import { checkTransaction } from '../services/transactionChecker'
 import { canUnlock, useUnlock } from '../services/unlockService'
 
@@ -104,6 +104,17 @@ router.post('/check', async (req, res) => {
   } catch (error) {
     console.error('Error checking transaction:', error)
     res.status(500).json({ error: 'Failed to check transaction' })
+  }
+})
+
+// Delete all transactions
+router.delete('/', async (req, res) => {
+  try {
+    await deleteAllTransactions()
+    res.json({ message: 'All transactions deleted successfully' })
+  } catch (error) {
+    console.error('Error deleting transactions:', error)
+    res.status(500).json({ error: 'Failed to delete transactions' })
   }
 })
 

@@ -11,12 +11,7 @@ const keywordMatchers = [
   { pattern: /fitness|gym|studio/i, name: 'Fitnessabo', category: 'Abonnement' },
 ]
 
-const DEFAULT_FIXED_COSTS = [
-  { name: 'Miete', amount: 800, category: 'Rechnungen' },
-  { name: 'Strom & Gas', amount: 120, category: 'Rechnungen' },
-  { name: 'Internet & Telefon', amount: 45, category: 'Rechnungen' },
-  { name: 'Versicherung', amount: 180, category: 'Versicherung' },
-]
+const DEFAULT_FIXED_COSTS: Array<{ name: string; amount: number; category: string }> = []
 
 interface GroupedCost {
   key: string
@@ -167,7 +162,17 @@ export function analyzeFixedCosts(transactions: Transaction[], upcomingTransacti
   let insights = Array.from(groups.values()).map(group => buildInsightFromGroup(group))
   let total = insights.reduce((sum, insight) => sum + insight.averageAmount, 0)
 
-  if (total === 0) {
+  // No default fixed costs - return empty if no transactions found
+  // If total === 0, return empty insights and 0 total
+  if (total === 0 && DEFAULT_FIXED_COSTS.length === 0) {
+    return {
+      total: 0,
+      insights: [],
+    }
+  }
+
+  // Only use default costs if they exist and no transactions found
+  if (total === 0 && DEFAULT_FIXED_COSTS.length > 0) {
     insights = DEFAULT_FIXED_COSTS.map((cost, index) => ({
       id: `default-${index}`,
       name: cost.name,

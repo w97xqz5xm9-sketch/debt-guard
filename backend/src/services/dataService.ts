@@ -31,138 +31,7 @@ const today = () => {
   return date.toISOString()
 }
 
-let transactions: Transaction[] = [
-  {
-    id: '1',
-    amount: 45.50,
-    description: 'Lebensmittel Einkauf',
-    category: 'Lebensmittel',
-    date: today(),
-    type: 'expense',
-  },
-  {
-    id: '2',
-    amount: 12.90,
-    description: 'Kaffee & Brötchen',
-    category: 'Lebensmittel',
-    date: today(),
-    type: 'expense',
-  },
-  {
-    id: '3',
-    amount: 8.50,
-    description: 'ÖPNV Ticket',
-    category: 'Transport',
-    date: today(),
-    type: 'expense',
-  },
-  {
-    id: '4',
-    amount: 89.99,
-    description: 'Online Shopping - Kleidung',
-    category: 'Einkaufen',
-    date: daysAgo(1),
-    type: 'expense',
-  },
-  {
-    id: '5',
-    amount: 15.20,
-    description: 'Mittagessen',
-    category: 'Lebensmittel',
-    date: daysAgo(1),
-    type: 'expense',
-  },
-  {
-    id: '6',
-    amount: 4.50,
-    description: 'Kaffee to go',
-    category: 'Lebensmittel',
-    date: daysAgo(1),
-    type: 'expense',
-  },
-  {
-    id: '7',
-    amount: 32.00,
-    description: 'Tankstelle',
-    category: 'Transport',
-    date: daysAgo(2),
-    type: 'expense',
-  },
-  {
-    id: '8',
-    amount: 25.00,
-    description: 'Netflix Abo',
-    category: 'Unterhaltung',
-    date: daysAgo(2),
-    type: 'expense',
-  },
-  {
-    id: '9',
-    amount: 120.00,
-    description: 'Friseur',
-    category: 'Sonstiges',
-    date: daysAgo(3),
-    type: 'expense',
-  },
-  {
-    id: '10',
-    amount: 67.80,
-    description: 'Supermarkt Einkauf',
-    category: 'Lebensmittel',
-    date: daysAgo(3),
-    type: 'expense',
-  },
-  {
-    id: '11',
-    amount: 45.00,
-    description: 'Restaurant',
-    category: 'Lebensmittel',
-    date: daysAgo(4),
-    type: 'expense',
-  },
-  {
-    id: '12',
-    amount: 3000.00,
-    description: 'Gehalt',
-    category: 'Einkommen',
-    date: daysAgo(5),
-    type: 'income',
-  },
-  {
-    id: '13',
-    amount: 199.99,
-    description: 'Elektronik - Kopfhörer',
-    category: 'Einkaufen',
-    date: daysAgo(7),
-    type: 'expense',
-  },
-  {
-    id: '14',
-    amount: 9.99,
-    description: 'Spotify Premium',
-    category: 'Unterhaltung',
-    date: daysAgo(7),
-    type: 'expense',
-  },
-  {
-    id: '15',
-    amount: 85.00,
-    description: 'Fitnessstudio',
-    category: 'Sonstiges',
-    date: daysAgo(8),
-    type: 'expense',
-  },
-  {
-    id: '16',
-    amount: 250.00,
-    description: 'Impulskauf - Blockiert',
-    category: 'Einkaufen',
-    date: daysAgo(2),
-    type: 'expense',
-    blocked: true,
-    warningLevel: 'critical',
-  },
-]
+let transactions: Transaction[] = []
 
 let savingsGoals: SavingsGoal[] = [
   {
@@ -188,40 +57,7 @@ let savingsGoals: SavingsGoal[] = [
   },
 ]
 
-const upcomingTransactions: Transaction[] = [
-  {
-    id: 'upcoming-1',
-    amount: 800,
-    description: 'Miete',
-    category: 'Rechnungen',
-    date: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString(),
-    type: 'expense',
-  },
-  {
-    id: 'upcoming-2',
-    amount: 120,
-    description: 'Strom & Gas',
-    category: 'Rechnungen',
-    date: new Date(Date.now() + 10 * 24 * 60 * 60 * 1000).toISOString(),
-    type: 'expense',
-  },
-  {
-    id: 'upcoming-3',
-    amount: 45,
-    description: 'Internet & Telefon',
-    category: 'Rechnungen',
-    date: new Date(Date.now() + 12 * 24 * 60 * 60 * 1000).toISOString(),
-    type: 'expense',
-  },
-  {
-    id: 'upcoming-4',
-    amount: 180,
-    description: 'Versicherung',
-    category: 'Rechnungen',
-    date: new Date(Date.now() + 15 * 24 * 60 * 60 * 1000).toISOString(),
-    type: 'expense',
-  },
-]
+const upcomingTransactions: Transaction[] = []
 
 // Check if database is available
 async function useDatabase(): Promise<boolean> {
@@ -365,4 +201,19 @@ export async function getSavingsGoals(): Promise<SavingsGoal[]> {
     }
   }
   return savingsGoals
+}
+
+// Delete all transactions from database
+export async function deleteAllTransactions(): Promise<void> {
+  if (await useDatabase()) {
+    try {
+      await query('DELETE FROM transactions')
+      console.log('✅ All transactions deleted from database')
+    } catch (error) {
+      console.error('Error deleting transactions from database:', error)
+      throw error
+    }
+  }
+  // Clear in-memory transactions
+  transactions.length = 0
 }
