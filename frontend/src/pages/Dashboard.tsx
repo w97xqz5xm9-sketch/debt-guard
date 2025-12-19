@@ -78,7 +78,7 @@ export default function Dashboard() {
       <div className="card bg-gradient-to-br from-primary-600 to-primary-800 text-white">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-2xl font-bold mb-2">Heute ausgegeben</h2>
+            <h2 className="text-2xl font-bold mb-2">Letzte 3 Tage ausgegeben</h2>
             <p className="text-4xl font-bold mb-1">
               {budget.spentToday.toFixed(2)} €
             </p>
@@ -94,7 +94,7 @@ export default function Dashboard() {
         {/* Progress Bar */}
         <div className="mt-6">
           <div className="flex justify-between text-sm mb-2">
-            <span>Tageslimit-Verbrauch</span>
+            <span>3-Tage-Limit-Verbrauch</span>
             <span>{budgetPercentage.toFixed(0)}%</span>
           </div>
           <div className="w-full bg-white/20 rounded-full h-3">
@@ -128,7 +128,7 @@ export default function Dashboard() {
             <div>
               <h3 className="font-semibold text-danger-900">Kritisches Budget-Limit erreicht!</h3>
               <p className="text-sm text-danger-700 mt-1">
-                Du hast bereits {budgetPercentage.toFixed(0)}% deines Tagesbudgets verbraucht.
+                Du hast bereits {budgetPercentage.toFixed(0)}% deines 3-Tage-Budgets verbraucht.
                 Weitere Ausgaben werden blockiert.
               </p>
             </div>
@@ -143,7 +143,7 @@ export default function Dashboard() {
             <div>
               <h3 className="font-semibold text-yellow-900">Budget-Warnung</h3>
               <p className="text-sm text-yellow-700 mt-1">
-                Du näherst dich deinem Tageslimit. Sei vorsichtig mit weiteren Ausgaben.
+                Du näherst dich deinem 3-Tage-Limit. Sei vorsichtig mit weiteren Ausgaben.
               </p>
             </div>
           </div>

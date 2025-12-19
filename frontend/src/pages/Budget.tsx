@@ -100,7 +100,7 @@ export default function Budget() {
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
           <div className="bg-primary-50 p-4 rounded-lg">
-            <p className="text-sm text-primary-700 mb-1">Täglich verfügbar</p>
+            <p className="text-sm text-primary-700 mb-1">3-Tage-Limit verfügbar</p>
             <p className="text-3xl font-bold text-primary-900">
               {calculation.dailyAvailable.toFixed(2)} €
             </p>
@@ -176,7 +176,7 @@ export default function Budget() {
       <div className="card">
         <h2 className="text-xl font-semibold mb-4">Kauf prüfen</h2>
         <p className="text-sm text-gray-600 mb-4">
-          Prüfe, ob ein Kauf erlaubt ist. Größere Käufe (z.B. Schuhe) werden blockiert, wenn dein Tageslimit erreicht ist.
+          Prüfe, ob ein Kauf erlaubt ist. Größere Käufe (z.B. Schuhe) werden blockiert, wenn dein 3-Tage-Limit erreicht ist.
         </p>
 
         <div className="space-y-4">
@@ -277,7 +277,7 @@ export default function Budget() {
                         Transaktion blockiert
                       </h3>
                       <p className="text-sm text-danger-700 mb-3">
-                        {checkResult.blockReason || 'Diese Ausgabe würde dein Tagesbudget überschreiten.'}
+                        {checkResult.blockReason || 'Diese Ausgabe würde dein 3-Tage-Budget überschreiten.'}
                       </p>
                       {checkResult.canUnlock && unlocksRemaining > 0 && (
                         <div className="mt-3 p-3 bg-primary-50 rounded-lg border border-primary-200">

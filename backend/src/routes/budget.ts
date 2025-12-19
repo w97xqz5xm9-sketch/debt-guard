@@ -10,15 +10,22 @@ router.get('/current', async (req, res) => {
     const calculation = await calculateDailyBudget()
     const transactions = await getTransactions()
     
-    // Calculate spent today
+    // Calculate spent in last 3 days (rolling window: today, yesterday, day before yesterday)
     const today = new Date()
     today.setHours(0, 0, 0, 0)
     
-    const spentToday = transactions
+    const threeDaysAgo = new Date(today)
+    threeDaysAgo.setDate(threeDaysAgo.getDate() - 2) // 2 days ago (so we include today, yesterday, and 2 days ago)
+    threeDaysAgo.setHours(0, 0, 0, 0)
+    
+    const spentLast3Days = transactions
       .filter(t => {
         const transactionDate = new Date(t.date)
         transactionDate.setHours(0, 0, 0, 0)
-        return transactionDate.getTime() === today.getTime() && t.type === 'expense'
+        // Include transactions from the last 3 days (today, yesterday, day before yesterday)
+        return transactionDate >= threeDaysAgo && 
+               transactionDate <= today && 
+               t.type === 'expense'
       })
       .reduce((sum, t) => sum + t.amount, 0)
 
@@ -27,16 +34,17 @@ router.get('/current', async (req, res) => {
     const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate()
     const remainingDays = daysInMonth - now.getDate() + 1
 
-    const dailyBudget = calculation.dailyAvailable
-    const availableToday = dailyBudget - spentToday
+    // calculation.dailyAvailable now represents the 3-day limit
+    const threeDayLimit = calculation.dailyAvailable
+    const availableIn3Days = threeDayLimit - spentLast3Days
 
     const budget = {
       id: 'current',
-      dailyBudget, // Total daily budget
+      dailyBudget: threeDayLimit, // 3-day limit (kept as dailyBudget for compatibility)
       monthlyBudget: calculation.monthlyAvailable,
-      availableToday: Math.max(0, availableToday), // Remaining today
-      spentToday,
-      remainingToday: Math.max(0, dailyBudget - spentToday), // Explicit remaining amount
+      availableToday: Math.max(0, availableIn3Days), // Remaining in 3-day window
+      spentToday: spentLast3Days, // Spent in last 3 days (kept as spentToday for compatibility)
+      remainingToday: Math.max(0, threeDayLimit - spentLast3Days), // Explicit remaining amount in 3-day window
       remainingDays,
       lastUpdated: new Date().toISOString(),
     }

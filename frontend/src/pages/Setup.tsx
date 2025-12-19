@@ -209,7 +209,7 @@ export default function Setup({ onComplete }: SetupProps) {
           )}
 
           <p className="text-xs text-gray-500 mt-4">
-            Die App analysiert automatisch deine Fixkosten und berechnet dein Tageslimit
+            Die App analysiert automatisch deine Fixkosten und berechnet dein 3-Tage-Limit
           </p>
         </div>
       </div>
