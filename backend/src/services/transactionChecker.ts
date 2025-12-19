@@ -14,11 +14,12 @@ export async function checkTransaction(
   const budget = await calculateDailyBudget()
   const transactions = await getTransactions()
   
-  // Get today's date
+  // Get today's date (consistent with budgetCalculator)
   const today = new Date()
   today.setHours(0, 0, 0, 0)
   
   // Calculate spent in last 3 days (rolling window: today, yesterday, day before yesterday)
+  // This must match the calculation in budgetCalculator exactly
   const threeDaysAgo = new Date(today)
   threeDaysAgo.setDate(threeDaysAgo.getDate() - 2) // 2 days ago (so we include today, yesterday, and 2 days ago)
   threeDaysAgo.setHours(0, 0, 0, 0)
@@ -37,6 +38,8 @@ export async function checkTransaction(
   const MINIMUM_DAILY_AMOUNT = 12.50 // Same as in budgetCalculator
   // budget.dailyAvailable now represents the 3-day limit
   const threeDayLimit = budget.dailyAvailable
+  
+  // Calculate what would be available after this transaction
   const availableAfterTransaction = threeDayLimit - spentLast3Days - amount
 
   // Always allow small necessary purchases (under minimum) even if budget is exceeded
@@ -63,26 +66,15 @@ export async function checkTransaction(
     }
   }
 
+  // Special rules for large purchases (>50€)
+  const budgetUsage = threeDayLimit > 0 ? ((spentLast3Days + amount) / threeDayLimit) * 100 : 0
+  
   // Check if transaction would exceed 3-day budget
   if (availableAfterTransaction < 0) {
-    return {
-      allowed: false,
-      blockReason: `Diese Ausgabe würde dein 3-Tage-Limit von ${threeDayLimit.toFixed(2)} € um ${Math.abs(availableAfterTransaction).toFixed(2)} € überschreiten.`,
-    }
-  }
-
-  // Special rules for large purchases (>50€)
-  const budgetUsage = ((spentLast3Days + amount) / threeDayLimit) * 100
-  
-  if (isLargePurchase) {
-    // Rule 1: If purchase exceeds 3-day budget, check if we have enough unused budget
-    if (availableAfterTransaction < 0) {
-      // Calculate how much unused budget we have (from previous days)
-      // This allows large purchases if user saved money on previous days
-      const excessAmount = Math.abs(availableAfterTransaction)
-      
-      // Allow if excess is reasonable (e.g., up to 2x daily budget for large purchases)
-      // This means: if daily budget is 50€, allow up to 100€ purchase if user saved enough
+    const excessAmount = Math.abs(availableAfterTransaction)
+    
+    // For large purchases, check if we can allow some excess
+    if (isLargePurchase) {
       const dailyBudget = threeDayLimit / 3 // Calculate daily budget from 3-day limit
       const maxAllowedExcess = dailyBudget * 2 // Can exceed by up to 2x daily budget
       
@@ -91,24 +83,27 @@ export async function checkTransaction(
           allowed: true,
           warning: `⚠️ Große Ausgabe (${amount.toFixed(2)}€) überschreitet dein 3-Tage-Limit um ${excessAmount.toFixed(2)}€. Erlaubt, da du genug Budget von früheren Tagen hast.`,
         }
-      } else {
-        return {
-          allowed: false,
-          blockReason: `🚫 Große Ausgabe (${amount.toFixed(2)}€) würde dein 3-Tage-Limit um ${excessAmount.toFixed(2)}€ überschreiten. Das ist zu viel, auch mit nicht genutztem Budget.`,
-        }
       }
     }
     
-    // Rule 2: If purchase uses more than 80% of 3-day budget (but doesn't exceed it)
-    if (budgetUsage > 80) {
+    // Block if it exceeds too much
+    return {
+      allowed: false,
+      blockReason: `Diese Ausgabe würde dein 3-Tage-Limit von ${threeDayLimit.toFixed(2)} € um ${excessAmount.toFixed(2)} € überschreiten.`,
+    }
+  }
+  
+  if (isLargePurchase) {
+    // Rule 1: If purchase uses more than 80% of 3-day budget (but doesn't exceed it)
+    if (budgetUsage > 80 && availableAfterTransaction >= 0) {
       return {
         allowed: false,
         blockReason: `🚫 Große Ausgabe (${amount.toFixed(2)}€) würde ${budgetUsage.toFixed(0)}% deines 3-Tage-Limits verbrauchen. Große Käufe sind auf maximal 80% des 3-Tage-Limits beschränkt.`,
       }
     }
     
-    // Rule 3: Warning for large purchases that use 50-80% of 3-day budget
-    if (budgetUsage > 50 && budgetUsage <= 80) {
+    // Rule 2: Warning for large purchases that use 50-80% of 3-day budget
+    if (budgetUsage > 50 && budgetUsage <= 80 && availableAfterTransaction >= 0) {
       return {
         allowed: true,
         warning: `⚠️ Große Ausgabe (${amount.toFixed(2)}€) erkannt. Dies würde ${budgetUsage.toFixed(0)}% deines 3-Tage-Limits verbrauchen.`,

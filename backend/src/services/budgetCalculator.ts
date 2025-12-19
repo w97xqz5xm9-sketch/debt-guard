@@ -43,21 +43,27 @@ export async function calculateDailyBudget(): Promise<BudgetCalculation> {
   // Calculate variable budget: Income - Fixed Costs - Savings Goal
   const variableBudget = monthlyIncome - fixedCosts - setup.savingsGoal
 
-  // Calculate how much has been spent this month (excluding today)
+  // Calculate 3-day rolling window limit: (Gesamt Budget - Sparziel) / 10
+  // Gesamt Budget = monthlyIncome - fixedCosts
+  // Also: (monthlyIncome - fixedCosts - savingsGoal) / 10 = variableBudget / 10
+  const threeDayLimit = variableBudget / 10
+
+  // Get current date and time
   const now = new Date()
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+  today.setHours(0, 0, 0, 0)
+  
   const monthStart = new Date(now.getFullYear(), now.getMonth(), 1)
   monthStart.setHours(0, 0, 0, 0)
   
-  const today = new Date()
-  today.setHours(0, 0, 0, 0)
-  
+  // Calculate how much has been spent this month (including today)
   const spentThisMonth = transactions
     .filter(t => {
       const transactionDate = new Date(t.date)
       transactionDate.setHours(0, 0, 0, 0)
-      // Only count expenses from this month, but not today
+      // Count all expenses from this month including today
       return transactionDate >= monthStart && 
-             transactionDate < today && 
+             transactionDate <= today && 
              t.type === 'expense'
     })
     .reduce((sum, t) => sum + t.amount, 0)
@@ -65,45 +71,15 @@ export async function calculateDailyBudget(): Promise<BudgetCalculation> {
   // Calculate remaining budget: total variable budget minus what was already spent
   const remainingBudget = variableBudget - spentThisMonth
 
-  // Calculate daily limit (distribute remaining budget over remaining days)
-  const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate()
-  const dayOfMonth = now.getDate()
-  const remainingDaysInMonth = daysInMonth - dayOfMonth + 1
-
-  // Calculate average daily budget for the month
-  const averageDailyBudget = variableBudget / daysInMonth
-
   // Minimum daily amount that should always be available (for necessities like food, transport)
   const MINIMUM_DAILY_AMOUNT = 12.50 // 12,50€ minimum per day
+  const MINIMUM_3_DAY_AMOUNT = MINIMUM_DAILY_AMOUNT * 3 // Minimum for 3 days
 
-  // Flexible daily limit calculation:
-  // - Base: Average daily budget (what you "should" spend per day)
-  // - Plus: Accumulated unused budget from previous days
-  // - This allows spending more on some days if you spent less on others
-  
-  // Calculate how much was "planned" to be spent by now (average daily * days passed)
-  const daysPassed = dayOfMonth - 1 // Days that have passed (excluding today)
-  const plannedSpending = averageDailyBudget * daysPassed
-
-  // Calculate unused budget: planned spending minus actual spending
-  // If positive: you spent less than planned (have unused budget)
-  // If negative: you spent more than planned (over budget)
-  const unusedBudget = plannedSpending - spentThisMonth
-
-  // Daily available = average daily budget + accumulated unused budget / remaining days
-  // This way, if you spent less earlier, you have more available now
-  const calculatedDailyAvailable = averageDailyBudget + (unusedBudget / remainingDaysInMonth)
-
-  // Use the calculated amount, but never go below the minimum
-  // However, if remaining budget is negative, we still allow the minimum
-  const dailyAvailable = remainingBudget > 0 
-    ? Math.max(calculatedDailyAvailable, MINIMUM_DAILY_AMOUNT)
-    : MINIMUM_DAILY_AMOUNT
-
-  // Calculate 3-day rolling window limit (3x daily available)
-  const threeDayLimit = dailyAvailable * 3
+  // Ensure 3-day limit is never below minimum
+  const finalThreeDayLimit = Math.max(threeDayLimit, MINIMUM_3_DAY_AMOUNT)
 
   // Calculate spent in last 3 days (rolling window: today, yesterday, day before yesterday)
+  // This is a true rolling window - always the last 3 calendar days
   const threeDaysAgo = new Date(today)
   threeDaysAgo.setDate(threeDaysAgo.getDate() - 2) // 2 days ago (so we include today, yesterday, and 2 days ago)
   threeDaysAgo.setHours(0, 0, 0, 0)
@@ -120,29 +96,30 @@ export async function calculateDailyBudget(): Promise<BudgetCalculation> {
     .reduce((sum, t) => sum + t.amount, 0)
 
   // Calculate risk factor based on 3-day window
-  const budgetUsage = (spentLast3Days / threeDayLimit) * 100
+  // Risk factor is based on how much of the 3-day limit is used
+  const budgetUsage = finalThreeDayLimit > 0 ? (spentLast3Days / finalThreeDayLimit) * 100 : 0
   const riskFactor = Math.min(1, Math.max(0, budgetUsage / 100))
 
   // Generate recommendations
   const recommendations: string[] = []
   
   // Check if we're using the minimum (budget exceeded or very tight)
-  const isUsingMinimum = remainingBudget <= 0 || calculatedDailyAvailable < MINIMUM_DAILY_AMOUNT
+  const isUsingMinimum = remainingBudget <= 0 || finalThreeDayLimit <= MINIMUM_3_DAY_AMOUNT
   
-  const remainingIn3Days = threeDayLimit - spentLast3Days
+  const remainingIn3Days = Math.max(0, finalThreeDayLimit - spentLast3Days)
   
   if (isUsingMinimum) {
-    recommendations.push(`⚠️ Budget überschritten oder sehr knapp. Nur noch ${MINIMUM_DAILY_AMOUNT.toFixed(2)}€ pro Tag für notwendige Ausgaben verfügbar.`)
-  } else if (spentLast3Days >= threeDayLimit) {
-    recommendations.push('⚠️ 3-Tage-Limit erreicht! Größere Käufe werden blockiert.')
-  } else if (spentLast3Days >= threeDayLimit * 0.8) {
-    recommendations.push('Du näherst dich deinem 3-Tage-Limit. Sei vorsichtig mit weiteren Ausgaben.')
+    recommendations.push(`⚠️ Budget überschritten oder sehr knapp. Nur noch ${MINIMUM_3_DAY_AMOUNT.toFixed(2)}€ für 3 Tage für notwendige Ausgaben verfügbar.`)
+  } else if (spentLast3Days >= finalThreeDayLimit) {
+    recommendations.push(`⚠️ 3-Tage-Limit erreicht! Du hast bereits ${spentLast3Days.toFixed(2)}€ von ${finalThreeDayLimit.toFixed(2)}€ ausgegeben. Größere Käufe werden blockiert.`)
+  } else if (spentLast3Days >= finalThreeDayLimit * 0.8) {
+    recommendations.push(`⚠️ Du näherst dich deinem 3-Tage-Limit. Bereits ${spentLast3Days.toFixed(2)}€ von ${finalThreeDayLimit.toFixed(2)}€ ausgegeben. Sei vorsichtig mit weiteren Ausgaben.`)
   } else {
-    recommendations.push(`Du kannst in den nächsten 3 Tagen noch ${remainingIn3Days.toFixed(2)}€ ausgeben.`)
+    recommendations.push(`Du kannst in den nächsten 3 Tagen noch ${remainingIn3Days.toFixed(2)}€ ausgeben (von ${finalThreeDayLimit.toFixed(2)}€ Limit).`)
   }
 
   return {
-    dailyAvailable: Math.max(0, threeDayLimit), // Return 3-day limit as "dailyAvailable" for compatibility
+    dailyAvailable: Math.max(0, finalThreeDayLimit), // Return 3-day limit as "dailyAvailable" for compatibility
     monthlyAvailable: Math.max(0, variableBudget),
     upcomingDeductions: fixedCosts,
     savingsAllocation: setup.savingsGoal,
