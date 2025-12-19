@@ -4,11 +4,14 @@ import { getTransactions, getUpcomingTransactions } from './dataService'
 import { getMonthlySetup, isNewMonth } from './monthlySetup'
 import { analyzeFixedCosts } from './fixedCostAnalyzer'
 
-export async function calculateDailyBudget(): Promise<BudgetCalculation> {
+export async function calculateDailyBudget(simulateDate?: Date): Promise<BudgetCalculation> {
   const accounts = await getAccounts()
   const transactions = await getTransactions()
   const upcomingTransactions = await getUpcomingTransactions()
   const setup = await getMonthlySetup()
+  
+  // Use simulated date if provided, otherwise use current date
+  const referenceDate = simulateDate || new Date()
 
   // If no setup or new month, return default values (will trigger setup)
   if (!setup || await isNewMonth()) {
@@ -40,16 +43,8 @@ export async function calculateDailyBudget(): Promise<BudgetCalculation> {
   // Use setup income or calculated income
   const monthlyIncome = setup.monthlyIncome || lastMonthIncome || 3000
 
-  // Calculate variable budget: Income - Fixed Costs - Savings Goal
-  const variableBudget = monthlyIncome - fixedCosts - setup.savingsGoal
-
-  // Calculate 3-day rolling window limit: (Gesamt Budget - Sparziel) / 10
-  // Gesamt Budget = monthlyIncome - fixedCosts
-  // Also: (monthlyIncome - fixedCosts - savingsGoal) / 10 = variableBudget / 10
-  const threeDayLimit = variableBudget / 10
-
-  // Get current date and time
-  const now = new Date()
+  // Use reference date (simulated or current)
+  const now = referenceDate
   const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
   today.setHours(0, 0, 0, 0)
   
@@ -68,15 +63,39 @@ export async function calculateDailyBudget(): Promise<BudgetCalculation> {
     })
     .reduce((sum, t) => sum + t.amount, 0)
 
+  // Calculate Gesamt Budget: Income - Fixed Costs
+  const gesamtBudget = monthlyIncome - fixedCosts
+
+  // Calculate variable budget: Income - Fixed Costs - Savings Goal
+  const variableBudget = gesamtBudget - setup.savingsGoal
+
   // Calculate remaining budget: total variable budget minus what was already spent
   const remainingBudget = variableBudget - spentThisMonth
+
+  // Calculate remaining days in month
+  const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate()
+  const dayOfMonth = now.getDate()
+  const remainingDaysInMonth = daysInMonth - dayOfMonth + 1
+
+  // Calculate 3-day rolling window limit dynamically based on remaining budget
+  // Formula: (Verbleibendes Budget) / Anzahl der verbleibenden 3-Tage-Perioden
+  // Ein Monat hat ca. 10 x 3-Tage-Perioden (30 Tage)
+  const remainingThreeDayPeriods = Math.max(1, Math.ceil(remainingDaysInMonth / 3))
+  
+  // Calculate 3-day limit: remaining budget divided by remaining 3-day periods
+  // This ensures the limit adjusts as the month progresses
+  const threeDayLimit = remainingBudget > 0 
+    ? remainingBudget / remainingThreeDayPeriods
+    : 0
 
   // Minimum daily amount that should always be available (for necessities like food, transport)
   const MINIMUM_DAILY_AMOUNT = 12.50 // 12,50€ minimum per day
   const MINIMUM_3_DAY_AMOUNT = MINIMUM_DAILY_AMOUNT * 3 // Minimum for 3 days
 
-  // Ensure 3-day limit is never below minimum
-  const finalThreeDayLimit = Math.max(threeDayLimit, MINIMUM_3_DAY_AMOUNT)
+  // Ensure 3-day limit is never below minimum (if there's any budget left)
+  const finalThreeDayLimit = remainingBudget > 0
+    ? Math.max(threeDayLimit, MINIMUM_3_DAY_AMOUNT)
+    : MINIMUM_3_DAY_AMOUNT
 
   // Calculate spent in last 3 days (rolling window: today, yesterday, day before yesterday)
   // This is a true rolling window - always the last 3 calendar days

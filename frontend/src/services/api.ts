@@ -28,13 +28,15 @@ api.interceptors.response.use(
 )
 
 export const budgetApi = {
-  getCurrentBudget: async (): Promise<Budget> => {
-    const response = await api.get<Budget>('/budget/current')
+  getCurrentBudget: async (simulateDate?: Date): Promise<Budget> => {
+    const params = simulateDate ? { simulateDate: simulateDate.toISOString() } : {}
+    const response = await api.get<Budget>('/budget/current', { params })
     return response.data
   },
 
-  calculateBudget: async (): Promise<BudgetCalculation> => {
-    const response = await api.get<BudgetCalculation>('/budget/calculate')
+  calculateBudget: async (simulateDate?: Date): Promise<BudgetCalculation> => {
+    const params = simulateDate ? { simulateDate: simulateDate.toISOString() } : {}
+    const response = await api.get<BudgetCalculation>('/budget/calculate', { params })
     return response.data
   },
 

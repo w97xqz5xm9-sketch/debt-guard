@@ -7,11 +7,19 @@ const router = express.Router()
 // Get current budget status
 router.get('/current', async (req, res) => {
   try {
-    const calculation = await calculateDailyBudget()
+    // Check if simulateDate is provided
+    const simulateDate = req.query.simulateDate 
+      ? new Date(req.query.simulateDate as string)
+      : undefined
+    
+    const calculation = await calculateDailyBudget(simulateDate)
     const transactions = await getTransactions()
     
+    // Use simulated date if provided
+    const referenceDate = simulateDate || new Date()
+    
     // Calculate spent in last 3 days (rolling window: today, yesterday, day before yesterday)
-    const today = new Date()
+    const today = new Date(referenceDate.getFullYear(), referenceDate.getMonth(), referenceDate.getDate())
     today.setHours(0, 0, 0, 0)
     
     const threeDaysAgo = new Date(today)
@@ -59,7 +67,12 @@ router.get('/current', async (req, res) => {
 // Calculate budget
 router.get('/calculate', async (req, res) => {
   try {
-    const calculation = await calculateDailyBudget()
+    // Check if simulateDate is provided
+    const simulateDate = req.query.simulateDate 
+      ? new Date(req.query.simulateDate as string)
+      : undefined
+    
+    const calculation = await calculateDailyBudget(simulateDate)
     res.json(calculation)
   } catch (error) {
     console.error('Error calculating budget:', error)

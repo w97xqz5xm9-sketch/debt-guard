@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { AlertTriangle, TrendingDown, Shield, Zap } from 'lucide-react'
+import { AlertTriangle, TrendingDown, Shield, Zap, ChevronLeft, ChevronRight, Calendar } from 'lucide-react'
 import { budgetApi } from '../services/api'
 import type { Budget, Transaction, BudgetCalculation } from '../types'
 
@@ -9,18 +9,23 @@ export default function Dashboard() {
   const [calculation, setCalculation] = useState<BudgetCalculation | null>(null)
   const [recentTransactions, setRecentTransactions] = useState<Transaction[]>([])
   const [loading, setLoading] = useState(true)
+  const [simulateDate, setSimulateDate] = useState<Date>(new Date())
+  const [isSimulating, setIsSimulating] = useState(false)
 
   useEffect(() => {
     loadData()
-    const interval = setInterval(loadData, 30000) // Update every 30 seconds
-    return () => clearInterval(interval)
-  }, [])
+    if (!isSimulating) {
+      const interval = setInterval(loadData, 30000) // Update every 30 seconds
+      return () => clearInterval(interval)
+    }
+  }, [simulateDate, isSimulating])
 
   const loadData = async () => {
     try {
+      const dateToUse = isSimulating ? simulateDate : undefined
       const [budgetData, calcData, transactions] = await Promise.all([
-        budgetApi.getCurrentBudget(),
-        budgetApi.calculateBudget(),
+        budgetApi.getCurrentBudget(dateToUse),
+        budgetApi.calculateBudget(dateToUse),
         budgetApi.getTransactions(),
       ])
       setBudget(budgetData)
@@ -31,6 +36,34 @@ export default function Dashboard() {
     } finally {
       setLoading(false)
     }
+  }
+
+  const goToNextDay = () => {
+    const nextDay = new Date(simulateDate)
+    nextDay.setDate(nextDay.getDate() + 1)
+    setSimulateDate(nextDay)
+    setIsSimulating(true)
+  }
+
+  const goToPreviousDay = () => {
+    const prevDay = new Date(simulateDate)
+    prevDay.setDate(prevDay.getDate() - 1)
+    setSimulateDate(prevDay)
+    setIsSimulating(true)
+  }
+
+  const resetToToday = () => {
+    setSimulateDate(new Date())
+    setIsSimulating(false)
+  }
+
+  const formatDate = (date: Date) => {
+    return date.toLocaleDateString('de-DE', { 
+      weekday: 'long', 
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric' 
+    })
   }
 
   if (loading) {
@@ -65,13 +98,54 @@ export default function Dashboard() {
   return (
     <div className="space-y-6">
       {/* Quick Action */}
-      <div className="flex justify-end">
+      <div className="flex justify-between items-center">
         <Link
           to="/setup"
           className="btn-secondary flex items-center space-x-2"
         >
           <span>Setup ändern</span>
         </Link>
+      </div>
+
+      {/* Date Simulation Controls */}
+      <div className="card bg-blue-50 border-blue-200">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-3">
+            <Calendar className="h-5 w-5 text-blue-600" />
+            <div>
+              <p className="text-sm font-medium text-blue-900">
+                {isSimulating ? 'Simulation aktiv' : 'Live-Modus'}
+              </p>
+              <p className="text-xs text-blue-700">
+                {formatDate(simulateDate)}
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center space-x-2">
+            <button
+              onClick={goToPreviousDay}
+              className="p-2 rounded-lg bg-white hover:bg-blue-100 transition-colors"
+              title="Vorheriger Tag"
+            >
+              <ChevronLeft className="h-5 w-5 text-blue-600" />
+            </button>
+            <button
+              onClick={goToNextDay}
+              className="p-2 rounded-lg bg-white hover:bg-blue-100 transition-colors"
+              title="Nächster Tag"
+            >
+              <ChevronRight className="h-5 w-5 text-blue-600" />
+            </button>
+            {isSimulating && (
+              <button
+                onClick={resetToToday}
+                className="px-3 py-2 text-sm rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors"
+              >
+                Zurück zu heute
+              </button>
+            )}
+          </div>
+        </div>
       </div>
 
       {/* Hero Section - Simplified */}
