@@ -16,18 +16,18 @@ export default function Layout({ children }: LayoutProps) {
   ]
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-black">
       {/* Header */}
-      <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
+      <header className="bg-black border-b border-gray-200 sticky top-0 z-50 backdrop-blur-sm bg-opacity-95">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center space-x-3">
-              <div className="bg-primary-600 p-2 rounded-lg">
+              <div className="p-2 rounded-lg gradient-iridescent border border-gray-200">
                 <Shield className="h-6 w-6 text-white" />
               </div>
               <div>
-                <h1 className="text-xl font-bold text-gray-900">Debt Guard</h1>
-                <p className="text-xs text-gray-500">Schutz vor Überschulden</p>
+                <h1 className="text-xl font-bold text-white tracking-wider uppercase">DEBT GUARD</h1>
+                <p className="text-xs text-gray-600 uppercase tracking-wide">Schutz vor Überschulden</p>
               </div>
             </div>
             <nav className="flex space-x-1 items-center">
@@ -38,24 +38,24 @@ export default function Layout({ children }: LayoutProps) {
                   <Link
                     key={item.path}
                     to={item.path}
-                    className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-colors ${
+                    className={`flex items-center space-x-2 px-4 py-2 rounded-xl transition-all duration-300 ${
                       isActive
-                        ? 'bg-primary-100 text-primary-700'
-                        : 'text-gray-600 hover:bg-gray-100'
+                        ? 'bg-gray-100 text-white border border-gray-200'
+                        : 'text-gray-600 hover:bg-gray-100 hover:text-white border border-transparent'
                     }`}
                   >
                     <Icon className="h-5 w-5" />
-                    <span className="hidden sm:inline">{item.label}</span>
+                    <span className="hidden sm:inline text-sm font-medium tracking-wide">{item.label}</span>
                   </Link>
                 )
               })}
               <Link
                 to="/setup"
-                className="flex items-center space-x-2 px-4 py-2 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors"
+                className="flex items-center space-x-2 px-4 py-2 rounded-xl text-gray-600 hover:bg-gray-100 hover:text-white transition-all duration-300 border border-transparent"
                 title="Setup ändern"
               >
                 <Edit className="h-5 w-5" />
-                <span className="hidden sm:inline text-sm">Setup</span>
+                <span className="hidden sm:inline text-sm font-medium tracking-wide">Setup</span>
               </Link>
             </nav>
           </div>

@@ -31,7 +31,7 @@ function GoalIcon({ amount }: { amount: SavingsGoalAmount }) {
             ? Gem
             : Crown
 
-  return <Icon className="h-6 w-6 text-primary-600" />
+  return <Icon className="h-6 w-6" />
 }
 
 export default function Setup({ onComplete }: SetupProps) {
@@ -130,14 +130,14 @@ export default function Setup({ onComplete }: SetupProps) {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary-50 to-primary-100 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-black flex items-center justify-center p-4">
       <div className="max-w-md w-full">
-        <div className="card text-center">
+        <div className="card border-gray-200 text-center">
           <div className="mb-6">
-            <div className="bg-primary-600 p-4 rounded-full w-20 h-20 mx-auto mb-4 flex items-center justify-center">
+            <div className="p-4 rounded-full w-20 h-20 mx-auto mb-4 flex items-center justify-center gradient-iridescent border border-gray-200">
               <Shield className="h-10 w-10 text-white" />
             </div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            <h1 className="text-3xl font-bold text-white mb-2 uppercase tracking-wider">
               {currentSetup ? 'Setup ändern' : 'Monats-Setup'}
             </h1>
             <p className="text-gray-600">
@@ -145,7 +145,7 @@ export default function Setup({ onComplete }: SetupProps) {
             </p>
             {currentSetup && changeInfo && changeInfo.remaining > 0 && (
               <div className="mt-2">
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-gray-600 uppercase tracking-wide">
                   Noch {changeInfo.remaining} Änderung{changeInfo.remaining !== 1 ? 'en' : ''} diesen Monat möglich
                 </p>
               </div>
@@ -157,17 +157,19 @@ export default function Setup({ onComplete }: SetupProps) {
               <button
                 key={amount}
                 onClick={() => setSavingsGoal(amount)}
-                className={`w-full p-6 rounded-xl border-2 transition-all ${
+                className={`w-full p-6 rounded-xl border-2 transition-all duration-300 ${
                   savingsGoal === amount
-                    ? 'border-primary-600 bg-primary-50 shadow-sm'
-                    : 'border-gray-200 hover:border-primary-300'
+                    ? 'border-white bg-gray-100 shadow-lg'
+                    : 'border-gray-200 hover:border-gray-300 bg-gray-50'
                 }`}
               >
                 <div className="flex items-center justify-center space-x-3">
-                  <GoalIcon amount={amount} />
+                  <div className={savingsGoal === amount ? 'text-white' : 'text-gray-600'}>
+                    <GoalIcon amount={amount} />
+                  </div>
                   <div className="text-left">
-                    <p className="font-semibold text-lg">{label}</p>
-                    <p className="text-sm text-gray-500">{description}</p>
+                    <p className={`font-semibold text-lg ${savingsGoal === amount ? 'text-white' : 'text-white'}`}>{label}</p>
+                    <p className={`text-sm ${savingsGoal === amount ? 'text-gray-600' : 'text-gray-600'}`}>{description}</p>
                   </div>
                 </div>
               </button>
@@ -175,17 +177,17 @@ export default function Setup({ onComplete }: SetupProps) {
           </div>
 
           <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-white mb-2 uppercase tracking-wide">
               Monatliches Einkommen (optional)
             </label>
             <input
               type="number"
               value={monthlyIncome}
               onChange={(e) => setMonthlyIncome(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              className="w-full px-4 py-2 border border-gray-200 rounded-xl bg-gray-50 text-white focus:ring-2 focus:ring-white focus:border-transparent transition-all duration-300"
               placeholder="3000"
             />
-            <p className="text-xs text-gray-500 mt-1">
+            <p className="text-xs text-gray-600 mt-1">
               Wird automatisch aus deinen Transaktionen erkannt, falls nicht angegeben
             </p>
           </div>
@@ -193,22 +195,22 @@ export default function Setup({ onComplete }: SetupProps) {
           <button
             onClick={handleSubmit}
             disabled={!savingsGoal || loading}
-            className={`w-full py-3 text-lg font-medium rounded-lg transition-colors ${
+            className={`w-full py-3 text-lg font-medium rounded-xl transition-all duration-300 uppercase tracking-wide ${
               !savingsGoal || loading
-                ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                : 'bg-primary-600 text-white hover:bg-primary-700'
+                ? 'bg-gray-100 text-gray-500 cursor-not-allowed border border-gray-200'
+                : 'btn-primary-accent'
             }`}
           >
             {loading ? 'Wird erstellt...' : currentSetup ? 'Setup ändern' : 'Setup starten'}
           </button>
           
           {!savingsGoal && (
-            <p className="text-sm text-danger-600 mt-2 text-center">
+            <p className="text-sm text-danger-DEFAULT mt-2 text-center uppercase tracking-wide">
               Bitte wähle ein Sparziel aus
             </p>
           )}
 
-          <p className="text-xs text-gray-500 mt-4">
+          <p className="text-xs text-gray-600 mt-4">
             Die App analysiert automatisch deine Fixkosten und berechnet dein 3-Tage-Limit
           </p>
         </div>
@@ -225,7 +227,7 @@ export default function Setup({ onComplete }: SetupProps) {
               console.error('Error:', error)
             }
           }}
-          className="text-xs text-gray-500 hover:text-gray-700 underline"
+          className="text-xs text-gray-600 hover:text-white underline transition-colors duration-300"
         >
           Setup zurücksetzen (Debug)
         </button>

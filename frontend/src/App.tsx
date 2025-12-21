@@ -31,7 +31,7 @@ function App() {
 
 
   if (needsSetup === null) {
-    return <div className="min-h-screen flex items-center justify-center">Lade...</div>
+    return <div className="min-h-screen flex items-center justify-center bg-black text-white">Lade...</div>
   }
 
   // Use HashRouter for Render.com static site compatibility

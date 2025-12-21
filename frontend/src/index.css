@@ -3,26 +3,116 @@
 @tailwind utilities;
 
 @layer base {
+  * {
+    @apply transition-colors duration-300;
+  }
+  
   body {
-    @apply bg-gray-50 text-gray-900;
+    @apply bg-black text-white antialiased;
+    font-family: 'Inter', 'SF Pro Display', 'Neue Haas Grotesk', system-ui, sans-serif;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-bold uppercase tracking-wider;
+    letter-spacing: 0.1em;
   }
 }
 
 @layer components {
+  /* Cards with subtle glow */
   .card {
-    @apply bg-white rounded-xl shadow-sm border border-gray-200 p-6;
+    @apply bg-gray-50 rounded-2xl p-6 border border-gray-200;
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.05), 0 2px 8px rgba(0, 0, 0, 0.3);
   }
   
+  .card-glow {
+    @apply card;
+    box-shadow: 0 0 0 1px rgba(139, 92, 246, 0.2), 0 2px 8px rgba(0, 0, 0, 0.3), 0 0 20px rgba(139, 92, 246, 0.1);
+  }
+  
+  /* Buttons */
   .btn-primary {
-    @apply bg-primary-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-primary-700 transition-colors;
+    @apply bg-white text-black px-6 py-3 rounded-xl font-medium tracking-wide;
+    @apply hover:bg-gray-900 hover:text-white;
+    @apply focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-black;
+    transition: all 0.3s ease-in-out;
   }
   
-  .btn-danger {
-    @apply bg-danger-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-danger-700 transition-colors;
+  .btn-primary:active {
+    @apply bg-gray-100;
+  }
+  
+  .btn-primary-accent {
+    @apply btn-primary;
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.9) 0%, rgba(59, 130, 246, 0.9) 50%, rgba(16, 185, 129, 0.9) 100%);
+    @apply text-white;
+    @apply hover:opacity-90;
+    box-shadow: 0 0 20px rgba(139, 92, 246, 0.3);
   }
   
   .btn-secondary {
-    @apply bg-gray-200 text-gray-800 px-4 py-2 rounded-lg font-medium hover:bg-gray-300 transition-colors;
+    @apply bg-gray-100 text-white px-6 py-3 rounded-xl font-medium tracking-wide border border-gray-200;
+    @apply hover:bg-gray-200 hover:border-gray-300;
+    @apply focus:outline-none focus:ring-2 focus:ring-gray-200 focus:ring-offset-2 focus:ring-offset-black;
+    transition: all 0.3s ease-in-out;
+  }
+  
+  .btn-danger {
+    @apply bg-danger-DEFAULT text-white px-6 py-3 rounded-xl font-medium tracking-wide;
+    @apply hover:bg-danger-light;
+    @apply focus:outline-none focus:ring-2 focus:ring-danger-DEFAULT focus:ring-offset-2 focus:ring-offset-black;
+    transition: all 0.3s ease-in-out;
+  }
+  
+  /* Iridescent gradient backgrounds */
+  .gradient-iridescent {
+    background: linear-gradient(135deg, 
+      rgba(139, 92, 246, 0.15) 0%, 
+      rgba(59, 130, 246, 0.15) 25%, 
+      rgba(16, 185, 129, 0.15) 50%, 
+      rgba(245, 158, 11, 0.15) 75%, 
+      rgba(139, 92, 246, 0.15) 100%);
+    background-size: 200% 200%;
+    animation: gradientShift 8s ease infinite;
+  }
+  
+  @keyframes gradientShift {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+  }
+  
+  /* Progress bars */
+  .progress-bar {
+    @apply w-full bg-gray-100 rounded-full h-2 overflow-hidden;
+  }
+  
+  .progress-fill {
+    @apply h-full rounded-full transition-all duration-500 ease-out;
+    background: linear-gradient(90deg, 
+      rgba(139, 92, 246, 0.8) 0%, 
+      rgba(59, 130, 246, 0.8) 50%, 
+      rgba(16, 185, 129, 0.8) 100%);
+  }
+  
+  /* Typography */
+  .heading-large {
+    @apply text-4xl font-bold uppercase tracking-widest;
+    letter-spacing: 0.15em;
+  }
+  
+  .heading-medium {
+    @apply text-2xl font-bold uppercase tracking-wide;
+    letter-spacing: 0.1em;
+  }
+  
+  .body-text {
+    @apply text-base leading-relaxed;
+    color: rgba(255, 255, 255, 0.9);
+  }
+  
+  .body-text-muted {
+    @apply text-sm;
+    color: rgba(255, 255, 255, 0.6);
   }
 }
 

@@ -67,13 +67,13 @@ export default function Dashboard() {
   }
 
   if (loading) {
-    return <div className="text-center py-12">Lade Daten...</div>
+    return <div className="text-center py-12 text-white">Lade Daten...</div>
   }
 
   if (!budget || !calculation) {
     return (
       <div className="text-center py-12">
-        <p className="mb-4">Keine Daten verfügbar</p>
+        <p className="mb-4 text-white">Keine Daten verfügbar</p>
         <button
           onClick={async () => {
             try {
@@ -108,15 +108,15 @@ export default function Dashboard() {
       </div>
 
       {/* Date Simulation Controls */}
-      <div className="card bg-blue-50 border-blue-200">
+      <div className="card border-gray-200">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
-            <Calendar className="h-5 w-5 text-blue-600" />
+            <Calendar className="h-5 w-5 text-white" />
             <div>
-              <p className="text-sm font-medium text-blue-900">
+              <p className="text-sm font-medium text-white uppercase tracking-wide">
                 {isSimulating ? 'Simulation aktiv' : 'Live-Modus'}
               </p>
-              <p className="text-xs text-blue-700">
+              <p className="text-xs text-gray-600">
                 {formatDate(simulateDate)}
               </p>
             </div>
@@ -124,22 +124,22 @@ export default function Dashboard() {
           <div className="flex items-center space-x-2">
             <button
               onClick={goToPreviousDay}
-              className="p-2 rounded-lg bg-white hover:bg-blue-100 transition-colors"
+              className="p-2 rounded-xl bg-gray-100 hover:bg-gray-200 border border-gray-200 transition-all duration-300"
               title="Vorheriger Tag"
             >
-              <ChevronLeft className="h-5 w-5 text-blue-600" />
+              <ChevronLeft className="h-5 w-5 text-white" />
             </button>
             <button
               onClick={goToNextDay}
-              className="p-2 rounded-lg bg-white hover:bg-blue-100 transition-colors"
+              className="p-2 rounded-xl bg-gray-100 hover:bg-gray-200 border border-gray-200 transition-all duration-300"
               title="Nächster Tag"
             >
-              <ChevronRight className="h-5 w-5 text-blue-600" />
+              <ChevronRight className="h-5 w-5 text-white" />
             </button>
             {isSimulating && (
               <button
                 onClick={resetToToday}
-                className="px-3 py-2 text-sm rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors"
+                className="px-3 py-2 text-sm rounded-xl bg-white text-black hover:bg-gray-900 hover:text-white transition-all duration-300 font-medium tracking-wide"
               >
                 Zurück zu heute
               </button>
@@ -149,45 +149,45 @@ export default function Dashboard() {
       </div>
 
       {/* Hero Section - Simplified */}
-      <div className="card bg-gradient-to-br from-primary-600 to-primary-800 text-white">
+      <div className="card-glow gradient-iridescent border-gray-200">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-2xl font-bold mb-2">Letzte 3 Tage ausgegeben</h2>
-            <p className="text-4xl font-bold mb-1">
+            <h2 className="text-2xl font-bold mb-2 text-white uppercase tracking-wider">Letzte 3 Tage ausgegeben</h2>
+            <p className="text-4xl font-bold mb-1 text-white">
               {budget.spentToday.toFixed(2)} €
             </p>
-            <p className="text-primary-100 text-sm">
+            <p className="text-gray-600 text-sm uppercase tracking-wide">
               von {budget.dailyBudget.toFixed(2)} € verfügbar
             </p>
           </div>
-          <div className="bg-white/20 p-4 rounded-xl">
-            <Shield className="h-12 w-12" />
+          <div className="bg-gray-100 p-4 rounded-xl border border-gray-200">
+            <Shield className="h-12 w-12 text-white" />
           </div>
         </div>
 
         {/* Progress Bar */}
         <div className="mt-6">
-          <div className="flex justify-between text-sm mb-2">
+          <div className="flex justify-between text-sm mb-2 text-white uppercase tracking-wide">
             <span>3-Tage-Limit-Verbrauch</span>
             <span>{budgetPercentage.toFixed(0)}%</span>
           </div>
-          <div className="w-full bg-white/20 rounded-full h-3">
+          <div className="w-full bg-gray-100 rounded-full h-2 border border-gray-200">
             <div
-              className={`h-3 rounded-full transition-all ${
+              className={`h-2 rounded-full transition-all duration-500 ${
                 isCritical
-                  ? 'bg-danger-500'
+                  ? 'bg-danger-DEFAULT'
                   : isWarning
-                  ? 'bg-yellow-500'
-                  : 'bg-success-500'
+                  ? 'bg-warning-DEFAULT'
+                  : 'bg-success-DEFAULT'
               }`}
               style={{ width: `${Math.min(budgetPercentage, 100)}%` }}
             />
           </div>
-          <div className="mt-4 pt-4 border-t border-white/20">
-            <p className="text-2xl font-bold mb-1">
+          <div className="mt-4 pt-4 border-t border-gray-200">
+            <p className="text-2xl font-bold mb-1 text-white">
               {budget.remainingToday.toFixed(2)} €
             </p>
-            <p className="text-primary-100 text-sm">
+            <p className="text-gray-600 text-sm uppercase tracking-wide">
               noch verfügbar
             </p>
           </div>
@@ -196,12 +196,12 @@ export default function Dashboard() {
 
       {/* Warnings */}
       {isCritical && (
-        <div className="card border-l-4 border-danger-500 bg-danger-50">
+        <div className="card border-l-4 border-danger-DEFAULT bg-danger-light border-gray-200">
           <div className="flex items-start space-x-3">
-            <AlertTriangle className="h-6 w-6 text-danger-600 flex-shrink-0 mt-0.5" />
+            <AlertTriangle className="h-6 w-6 text-danger-DEFAULT flex-shrink-0 mt-0.5" />
             <div>
-              <h3 className="font-semibold text-danger-900">Kritisches Budget-Limit erreicht!</h3>
-              <p className="text-sm text-danger-700 mt-1">
+              <h3 className="font-semibold text-white uppercase tracking-wide">Kritisches Budget-Limit erreicht!</h3>
+              <p className="text-sm text-gray-600 mt-1">
                 Du hast bereits {budgetPercentage.toFixed(0)}% deines 3-Tage-Budgets verbraucht.
                 Weitere Ausgaben werden blockiert.
               </p>
@@ -211,12 +211,12 @@ export default function Dashboard() {
       )}
 
       {isWarning && !isCritical && (
-        <div className="card border-l-4 border-yellow-500 bg-yellow-50">
+        <div className="card border-l-4 border-warning-DEFAULT bg-warning-light border-gray-200">
           <div className="flex items-start space-x-3">
-            <AlertTriangle className="h-6 w-6 text-yellow-600 flex-shrink-0 mt-0.5" />
+            <AlertTriangle className="h-6 w-6 text-warning-DEFAULT flex-shrink-0 mt-0.5" />
             <div>
-              <h3 className="font-semibold text-yellow-900">Budget-Warnung</h3>
-              <p className="text-sm text-yellow-700 mt-1">
+              <h3 className="font-semibold text-white uppercase tracking-wide">Budget-Warnung</h3>
+              <p className="text-sm text-gray-600 mt-1">
                 Du näherst dich deinem 3-Tage-Limit. Sei vorsichtig mit weiteren Ausgaben.
               </p>
             </div>
@@ -226,32 +226,32 @@ export default function Dashboard() {
 
       {/* Simplified Stats */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="card">
+        <div className="card border-gray-200">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-sm font-medium text-gray-600">Fixkosten (automatisch berechnet)</h3>
-            <TrendingDown className="h-5 w-5 text-danger-500" />
+            <h3 className="text-sm font-medium text-gray-600 uppercase tracking-wide">Fixkosten (automatisch berechnet)</h3>
+            <TrendingDown className="h-5 w-5 text-danger-DEFAULT" />
           </div>
-          <p className="text-2xl font-bold text-gray-900">
+          <p className="text-2xl font-bold text-white">
             {calculation.upcomingDeductions.toFixed(2)} €
           </p>
-          <p className="text-sm text-gray-500 mt-1">
+          <p className="text-sm text-gray-600 mt-1 uppercase tracking-wide">
             Automatisch erkannt
           </p>
           {calculation.fixedCostInsights && calculation.fixedCostInsights.length > 0 && (
-            <div className="mt-4 space-y-3 border-t border-gray-100 pt-4">
+            <div className="mt-4 space-y-3 border-t border-gray-200 pt-4">
               {calculation.fixedCostInsights.slice(0, 3).map((cost) => (
                 <div key={cost.id} className="flex items-start justify-between">
                   <div>
-                    <p className="font-medium text-gray-900">{cost.name}</p>
-                    <p className="text-xs text-gray-500">
+                    <p className="font-medium text-white">{cost.name}</p>
+                    <p className="text-xs text-gray-600">
                       {cost.frequency === 'irregular' ? 'Unregelmäßig' : cost.frequency === 'bi-weekly' ? '14-tägig' : cost.frequency === 'weekly' ? 'Wöchentlich' : 'Monatlich'}
                       {' • '}
                       {cost.source === 'upcoming' ? 'bevorstehend' : cost.source === 'history' ? 'erkannt' : 'geschätzt'}
                     </p>
                   </div>
                   <div className="text-right">
-                    <p className="font-semibold text-gray-900">{cost.averageAmount.toFixed(2)} €</p>
-                    <p className="text-xs text-gray-500">Konfidenz {(cost.confidence * 100).toFixed(0)}%</p>
+                    <p className="font-semibold text-white">{cost.averageAmount.toFixed(2)} €</p>
+                    <p className="text-xs text-gray-600">Konfidenz {(cost.confidence * 100).toFixed(0)}%</p>
                   </div>
                 </div>
               ))}
@@ -259,49 +259,49 @@ export default function Dashboard() {
           )}
         </div>
 
-        <div className="card">
+        <div className="card border-gray-200">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-sm font-medium text-gray-600">Sparziel</h3>
-            <Zap className="h-5 w-5 text-primary-500" />
+            <h3 className="text-sm font-medium text-gray-600 uppercase tracking-wide">Sparziel</h3>
+            <Zap className="h-5 w-5 text-white" />
           </div>
-          <p className="text-2xl font-bold text-gray-900">
+          <p className="text-2xl font-bold text-white">
             {calculation.savingsAllocation.toFixed(2)} €
           </p>
-          <p className="text-sm text-gray-500 mt-1">
+          <p className="text-sm text-gray-600 mt-1 uppercase tracking-wide">
             Diesen Monat
           </p>
         </div>
       </div>
 
       {/* Recent Transactions */}
-      <div className="card">
-        <h2 className="text-lg font-semibold mb-4">Letzte Transaktionen</h2>
+      <div className="card border-gray-200">
+        <h2 className="text-lg font-semibold mb-4 text-white uppercase tracking-wide">Letzte Transaktionen</h2>
         <div className="space-y-3">
           {recentTransactions.length === 0 ? (
-            <p className="text-gray-500 text-center py-4">Noch keine Transaktionen</p>
+            <p className="text-gray-600 text-center py-4">Noch keine Transaktionen</p>
           ) : (
             recentTransactions.map((transaction) => (
               <div
                 key={transaction.id}
-                className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+                className="flex items-center justify-between p-3 bg-gray-100 rounded-xl border border-gray-200"
               >
                 <div className="flex-1">
-                  <p className="font-medium text-gray-900">{transaction.description}</p>
-                  <p className="text-sm text-gray-500">
+                  <p className="font-medium text-white">{transaction.description}</p>
+                  <p className="text-sm text-gray-600">
                     {new Date(transaction.date).toLocaleDateString('de-DE')} • {transaction.category}
                   </p>
                 </div>
                 <div className="text-right">
                   <p
                     className={`font-semibold ${
-                      transaction.type === 'income' ? 'text-success-600' : 'text-danger-600'
+                      transaction.type === 'income' ? 'text-success-DEFAULT' : 'text-danger-DEFAULT'
                     }`}
                   >
                     {transaction.type === 'income' ? '+' : '-'}
                     {transaction.amount.toFixed(2)} €
                   </p>
                   {transaction.blocked && (
-                    <p className="text-xs text-danger-600 font-medium">Blockiert</p>
+                    <p className="text-xs text-danger-DEFAULT font-medium uppercase tracking-wide">Blockiert</p>
                   )}
                 </div>
               </div>
@@ -312,14 +312,14 @@ export default function Dashboard() {
 
       {/* Recommendations */}
       {calculation.recommendations.length > 0 && (
-        <div className="card bg-primary-50 border-primary-200">
-          <h2 className="text-lg font-semibold mb-4 text-primary-900">
+        <div className="card border-gray-200 gradient-iridescent">
+          <h2 className="text-lg font-semibold mb-4 text-white uppercase tracking-wide">
             Empfehlungen
           </h2>
           <ul className="space-y-2">
             {calculation.recommendations.map((rec, index) => (
-              <li key={index} className="flex items-start space-x-2 text-primary-800">
-                <span className="text-primary-600 mt-1">•</span>
+              <li key={index} className="flex items-start space-x-2 text-white">
+                <span className="text-white mt-1">•</span>
                 <span>{rec}</span>
               </li>
             ))}

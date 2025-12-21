@@ -7,41 +7,68 @@ export default {
   theme: {
     extend: {
       colors: {
-        primary: {
-          50: '#f0f9ff',
-          100: '#e0f2fe',
-          200: '#bae6fd',
-          300: '#7dd3fc',
-          400: '#38bdf8',
-          500: '#0ea5e9',
-          600: '#0284c7',
-          700: '#0369a1',
-          800: '#075985',
-          900: '#0c4a6e',
+        // Base colors
+        black: '#000000',
+        white: '#FFFFFF',
+        // Iridescent gradient colors (Öl-/Irideszenz-Effekt)
+        iridescent: {
+          violet: '#8B5CF6',
+          blue: '#3B82F6',
+          green: '#10B981',
+          yellow: '#F59E0B',
         },
+        // Grayscale for dark theme
+        gray: {
+          50: '#1A1A1A',
+          100: '#2A2A2A',
+          200: '#3A3A3A',
+          300: '#4A4A4A',
+          400: '#5A5A5A',
+          500: '#6A6A6A',
+          600: '#7A7A7A',
+          700: '#8A8A8A',
+          800: '#9A9A9A',
+          900: '#FFFFFF',
+        },
+        // Semantic colors (minimal, for warnings/errors only)
         danger: {
-          50: '#fef2f2',
-          100: '#fee2e2',
-          200: '#fecaca',
-          300: '#fca5a5',
-          400: '#f87171',
-          500: '#ef4444',
-          600: '#dc2626',
-          700: '#b91c1c',
-          800: '#991b1b',
-          900: '#7f1d1d',
+          DEFAULT: '#EF4444',
+          light: '#7F1D1D',
         },
         success: {
-          50: '#f0fdf4',
-          100: '#dcfce7',
-          200: '#bbf7d0',
-          300: '#86efac',
-          400: '#4ade80',
-          500: '#22c55e',
-          600: '#16a34a',
-          700: '#15803d',
-          800: '#166534',
-          900: '#14532d',
+          DEFAULT: '#10B981',
+          light: '#064E3B',
+        },
+        warning: {
+          DEFAULT: '#F59E0B',
+          light: '#78350F',
+        },
+      },
+      fontFamily: {
+        sans: ['Inter', 'SF Pro Display', 'Neue Haas Grotesk', 'system-ui', 'sans-serif'],
+      },
+      letterSpacing: {
+        'wide': '0.05em',
+        'wider': '0.1em',
+        'widest': '0.15em',
+      },
+      animation: {
+        'fade-in': 'fadeIn 0.4s ease-in-out',
+        'slide-up': 'slideUp 0.5s ease-out',
+        'glow': 'glow 2s ease-in-out infinite alternate',
+      },
+      keyframes: {
+        fadeIn: {
+          '0%': { opacity: '0' },
+          '100%': { opacity: '1' },
+        },
+        slideUp: {
+          '0%': { transform: 'translateY(10px)', opacity: '0' },
+          '100%': { transform: 'translateY(0)', opacity: '1' },
+        },
+        glow: {
+          '0%': { boxShadow: '0 0 5px rgba(139, 92, 246, 0.3)' },
+          '100%': { boxShadow: '0 0 20px rgba(139, 92, 246, 0.6), 0 0 30px rgba(59, 130, 246, 0.4)' },
         },
       },
     },

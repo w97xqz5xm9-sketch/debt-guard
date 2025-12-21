@@ -64,15 +64,15 @@ function UnlockSystem() {
 
   return (
     <div className="space-y-3">
-      <div className="p-4 bg-gray-50 rounded-lg">
+      <div className="p-4 bg-gray-100 rounded-xl border border-gray-200">
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center space-x-2">
             {unlocksRemaining > 0 ? (
-              <Unlock className="h-5 w-5 text-success-600" />
+              <Unlock className="h-5 w-5 text-success-DEFAULT" />
             ) : (
-              <Lock className="h-5 w-5 text-danger-600" />
+              <Lock className="h-5 w-5 text-danger-DEFAULT" />
             )}
-            <span className="font-medium text-gray-900">
+            <span className="font-medium text-white">
               {unlocksRemaining > 0 ? `Noch ${unlocksRemaining} Entsperrungen verfügbar` : 'Keine Entsperrungen mehr verfügbar'}
             </span>
           </div>
@@ -91,7 +91,7 @@ function UnlockSystem() {
           </button>
         ) : (
           <div className="space-y-2">
-            <p className="text-sm text-danger-600 font-medium">
+            <p className="text-sm text-danger-DEFAULT font-medium uppercase tracking-wide">
               Du brauchst einen neuen Zugangscode oder musst dir einen neuen kaufen.
             </p>
             {!showAccessCodeInput && (
@@ -112,7 +112,7 @@ function UnlockSystem() {
               value={accessCode}
               onChange={(e) => setAccessCode(e.target.value)}
               placeholder="Zugangscode eingeben"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              className="w-full px-4 py-2 border border-gray-200 rounded-xl bg-gray-50 text-white focus:ring-2 focus:ring-white focus:border-transparent transition-all duration-300"
             />
             <div className="flex space-x-2">
               <button
@@ -132,8 +132,8 @@ function UnlockSystem() {
                 Abbrechen
               </button>
             </div>
-            <p className="text-xs text-gray-500 mt-2">
-              Oder <a href="#" className="text-primary-600 underline">neuen Zugangscode kaufen</a>
+            <p className="text-xs text-gray-600 mt-2">
+              Oder <a href="#" className="text-white underline">neuen Zugangscode kaufen</a>
             </p>
           </div>
         )}
@@ -167,14 +167,14 @@ export default function Settings() {
   }
 
   if (loading) {
-    return <div className="text-center py-12">Lade Daten...</div>
+    return <div className="text-center py-12 text-white">Lade Daten...</div>
   }
 
   return (
     <div className="space-y-6">
-      <div className="card">
+      <div className="card border-gray-200">
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold">Einstellungen</h2>
+          <h2 className="text-2xl font-bold text-white uppercase tracking-wider">Einstellungen</h2>
           <Link
             to="/setup"
             className="btn-secondary flex items-center space-x-2"
@@ -186,23 +186,23 @@ export default function Settings() {
         {/* Accounts */}
         <div className="mb-8">
           <div className="flex items-center space-x-2 mb-4">
-            <CreditCard className="h-5 w-5 text-gray-600" />
-            <h3 className="text-lg font-semibold">Konten</h3>
+            <CreditCard className="h-5 w-5 text-white" />
+            <h3 className="text-lg font-semibold text-white uppercase tracking-wide">Konten</h3>
           </div>
           <div className="space-y-3">
             {accounts.length === 0 ? (
-              <p className="text-gray-500">Keine Konten konfiguriert</p>
+              <p className="text-gray-600">Keine Konten konfiguriert</p>
             ) : (
               accounts.map((account) => (
                 <div
                   key={account.id}
-                  className="flex items-center justify-between p-4 bg-gray-50 rounded-lg"
+                  className="flex items-center justify-between p-4 bg-gray-100 rounded-xl border border-gray-200"
                 >
                   <div>
-                    <p className="font-medium text-gray-900">{account.name}</p>
-                    <p className="text-sm text-gray-500 capitalize">{account.type}</p>
+                    <p className="font-medium text-white">{account.name}</p>
+                    <p className="text-sm text-gray-600 capitalize">{account.type}</p>
                   </div>
-                  <p className="text-lg font-semibold text-gray-900">
+                  <p className="text-lg font-semibold text-white">
                     {account.balance.toFixed(2)} €
                   </p>
                 </div>
@@ -216,27 +216,27 @@ export default function Settings() {
         {behavior && (
           <div className="mb-8">
             <div className="flex items-center space-x-2 mb-4">
-              <Bell className="h-5 w-5 text-gray-600" />
-              <h3 className="text-lg font-semibold">Ausgabeverhalten</h3>
+              <Bell className="h-5 w-5 text-white" />
+              <h3 className="text-lg font-semibold text-white uppercase tracking-wide">Ausgabeverhalten</h3>
             </div>
             <div className="space-y-4">
-              <div className="p-4 bg-gray-50 rounded-lg">
-                <p className="text-sm text-gray-600 mb-1">Durchschnittliche tägliche Ausgaben</p>
-                <p className="text-2xl font-bold text-gray-900">
+              <div className="p-4 bg-gray-100 rounded-xl border border-gray-200">
+                <p className="text-sm text-gray-600 mb-1 uppercase tracking-wide">Durchschnittliche tägliche Ausgaben</p>
+                <p className="text-2xl font-bold text-white">
                   {behavior.averageDailySpending.toFixed(2)} €
                 </p>
               </div>
-              <div className="p-4 bg-gray-50 rounded-lg">
-                <p className="text-sm text-gray-600 mb-1">Impulskäufe (letzter Monat)</p>
-                <p className="text-2xl font-bold text-gray-900">
+              <div className="p-4 bg-gray-100 rounded-xl border border-gray-200">
+                <p className="text-sm text-gray-600 mb-1 uppercase tracking-wide">Impulskäufe (letzter Monat)</p>
+                <p className="text-2xl font-bold text-white">
                   {behavior.impulsePurchaseCount}
                 </p>
               </div>
-              <div className="p-4 bg-gray-50 rounded-lg">
-                <p className="text-sm text-gray-600 mb-1">Risikolevel</p>
+              <div className="p-4 bg-gray-100 rounded-xl border border-gray-200">
+                <p className="text-sm text-gray-600 mb-1 uppercase tracking-wide">Risikolevel</p>
                 <p className={`text-2xl font-bold ${
-                  behavior.riskLevel === 'low' ? 'text-success-600' :
-                  behavior.riskLevel === 'medium' ? 'text-yellow-600' : 'text-danger-600'
+                  behavior.riskLevel === 'low' ? 'text-success-DEFAULT' :
+                  behavior.riskLevel === 'medium' ? 'text-warning-DEFAULT' : 'text-danger-DEFAULT'
                 }`}>
                   {behavior.riskLevel === 'low' ? 'Niedrig' :
                    behavior.riskLevel === 'medium' ? 'Mittel' : 'Hoch'}
@@ -249,8 +249,8 @@ export default function Settings() {
         {/* Unlock System */}
         <div>
           <div className="flex items-center space-x-2 mb-4">
-            <Bell className="h-5 w-5 text-gray-600" />
-            <h3 className="text-lg font-semibold">Zahlungsblockierung</h3>
+            <Bell className="h-5 w-5 text-white" />
+            <h3 className="text-lg font-semibold text-white uppercase tracking-wide">Zahlungsblockierung</h3>
           </div>
           <UnlockSystem />
         </div>
@@ -258,17 +258,17 @@ export default function Settings() {
         {/* Notification Settings */}
         <div>
           <div className="flex items-center space-x-2 mb-4">
-            <Bell className="h-5 w-5 text-gray-600" />
-            <h3 className="text-lg font-semibold">Benachrichtigungen</h3>
+            <Bell className="h-5 w-5 text-white" />
+            <h3 className="text-lg font-semibold text-white uppercase tracking-wide">Benachrichtigungen</h3>
           </div>
           <div className="space-y-3">
-            <label className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg cursor-pointer">
-              <input type="checkbox" defaultChecked className="w-5 h-5 text-primary-600" />
-              <span className="text-gray-700">Budget-Warnungen aktivieren</span>
+            <label className="flex items-center space-x-3 p-3 bg-gray-100 rounded-xl border border-gray-200 cursor-pointer">
+              <input type="checkbox" defaultChecked className="w-5 h-5 text-white" />
+              <span className="text-white">Budget-Warnungen aktivieren</span>
             </label>
-            <label className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg cursor-pointer">
-              <input type="checkbox" className="w-5 h-5 text-primary-600" />
-              <span className="text-gray-700">Tägliche Budget-Zusammenfassung</span>
+            <label className="flex items-center space-x-3 p-3 bg-gray-100 rounded-xl border border-gray-200 cursor-pointer">
+              <input type="checkbox" className="w-5 h-5 text-white" />
+              <span className="text-white">Tägliche Budget-Zusammenfassung</span>
             </label>
           </div>
         </div>
