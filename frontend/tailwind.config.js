@@ -10,12 +10,12 @@ export default {
         // Base colors
         black: '#000000',
         white: '#FFFFFF',
-        // Iridescent gradient colors (Öl-/Irideszenz-Effekt)
+        // Iridescent gradient colors (Öl-/Irideszenz-Effekt) - Intensiviert
         iridescent: {
-          violet: '#8B5CF6',
-          blue: '#3B82F6',
-          green: '#10B981',
-          yellow: '#F59E0B',
+          violet: '#A78BFA',
+          blue: '#60A5FA',
+          green: '#34D399',
+          yellow: '#FBBF24',
         },
         // Grayscale for dark theme
         gray: {
@@ -30,18 +30,18 @@ export default {
           800: '#9A9A9A',
           900: '#FFFFFF',
         },
-        // Semantic colors (minimal, for warnings/errors only)
+        // Semantic colors (minimal, for warnings/errors only) - Intensiviert
         danger: {
-          DEFAULT: '#EF4444',
-          light: '#7F1D1D',
+          DEFAULT: '#FF4444',
+          light: '#991F1F',
         },
         success: {
-          DEFAULT: '#10B981',
-          light: '#064E3B',
+          DEFAULT: '#22D3A6',
+          light: '#065F46',
         },
         warning: {
-          DEFAULT: '#F59E0B',
-          light: '#78350F',
+          DEFAULT: '#FCD34D',
+          light: '#92400E',
         },
       },
       fontFamily: {
@@ -67,8 +67,8 @@ export default {
           '100%': { transform: 'translateY(0)', opacity: '1' },
         },
         glow: {
-          '0%': { boxShadow: '0 0 5px rgba(139, 92, 246, 0.3)' },
-          '100%': { boxShadow: '0 0 20px rgba(139, 92, 246, 0.6), 0 0 30px rgba(59, 130, 246, 0.4)' },
+          '0%': { boxShadow: '0 0 10px rgba(167, 139, 250, 0.6), 0 0 20px rgba(96, 165, 250, 0.4)' },
+          '100%': { boxShadow: '0 0 30px rgba(167, 139, 250, 0.9), 0 0 50px rgba(96, 165, 250, 0.7), 0 0 70px rgba(52, 211, 153, 0.5)' },
         },
       },
     },
