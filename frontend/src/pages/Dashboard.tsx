@@ -108,15 +108,15 @@ export default function Dashboard() {
       </div>
 
       {/* Date Simulation Controls */}
-      <div className="card border-gray-200">
+      <div className="card">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
-            <Calendar className="h-5 w-5 text-white" />
+            <Calendar className="h-4 w-4 text-gray-500" />
             <div>
-              <p className="text-sm font-medium text-white uppercase tracking-wide">
+              <p className="body-text font-medium">
                 {isSimulating ? 'Simulation aktiv' : 'Live-Modus'}
               </p>
-              <p className="text-xs text-gray-600">
+              <p className="body-text-muted">
                 {formatDate(simulateDate)}
               </p>
             </div>
@@ -124,22 +124,22 @@ export default function Dashboard() {
           <div className="flex items-center space-x-2">
             <button
               onClick={goToPreviousDay}
-              className="p-2 rounded-xl bg-gray-100 hover:bg-gray-200 border border-gray-200 transition-all duration-300"
+              className="p-2 rounded-xl bg-gray-200 hover:bg-gray-300 transition-all duration-200"
               title="Vorheriger Tag"
             >
-              <ChevronLeft className="h-5 w-5 text-white" />
+              <ChevronLeft className="h-4 w-4 text-white" />
             </button>
             <button
               onClick={goToNextDay}
-              className="p-2 rounded-xl bg-gray-100 hover:bg-gray-200 border border-gray-200 transition-all duration-300"
+              className="p-2 rounded-xl bg-gray-200 hover:bg-gray-300 transition-all duration-200"
               title="Nächster Tag"
             >
-              <ChevronRight className="h-5 w-5 text-white" />
+              <ChevronRight className="h-4 w-4 text-white" />
             </button>
             {isSimulating && (
               <button
                 onClick={resetToToday}
-                className="px-3 py-2 text-sm rounded-xl bg-white text-black hover:bg-gray-900 hover:text-white transition-all duration-300 font-medium tracking-wide"
+                className="btn-secondary text-sm px-3 py-2"
               >
                 Zurück zu heute
               </button>
@@ -148,32 +148,32 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Hero Section - Simplified */}
-      <div className="card-glow gradient-iridescent border-gray-200">
-        <div className="flex items-center justify-between">
+      {/* Hero Section - Premium FinTech */}
+      <div className="card-glow gradient-iridescent">
+        <div className="flex items-center justify-between mb-6">
           <div>
-            <h2 className="text-2xl font-bold mb-2 text-white uppercase tracking-wider">Letzte 3 Tage ausgegeben</h2>
-            <p className="text-4xl font-bold mb-1 text-white">
+            <p className="label-text mb-2">Letzte 3 Tage ausgegeben</p>
+            <p className="heading-large mb-1">
               {budget.spentToday.toFixed(2)} €
             </p>
-            <p className="text-gray-600 text-sm uppercase tracking-wide">
+            <p className="body-text-muted">
               von {budget.dailyBudget.toFixed(2)} € verfügbar
             </p>
           </div>
-          <div className="bg-gray-100 p-4 rounded-xl border border-gray-200">
-            <Shield className="h-12 w-12 text-white" />
+          <div className="bg-gray-200 p-4 rounded-2xl">
+            <Shield className="h-10 w-10 text-white" />
           </div>
         </div>
 
         {/* Progress Bar */}
         <div className="mt-6">
-          <div className="flex justify-between text-sm mb-2 text-white uppercase tracking-wide">
-            <span>3-Tage-Limit-Verbrauch</span>
-            <span>{budgetPercentage.toFixed(0)}%</span>
+          <div className="flex justify-between mb-3">
+            <span className="label-text">3-Tage-Limit-Verbrauch</span>
+            <span className="body-text font-medium">{budgetPercentage.toFixed(0)}%</span>
           </div>
-          <div className="w-full bg-gray-100 rounded-full h-2 border border-gray-200">
+          <div className="progress-bar">
             <div
-              className={`h-2 rounded-full transition-all duration-500 ${
+              className={`progress-fill ${
                 isCritical
                   ? 'bg-danger-DEFAULT'
                   : isWarning
@@ -183,11 +183,11 @@ export default function Dashboard() {
               style={{ width: `${Math.min(budgetPercentage, 100)}%` }}
             />
           </div>
-          <div className="mt-4 pt-4 border-t border-gray-200">
-            <p className="text-2xl font-bold mb-1 text-white">
+          <div className="mt-6 pt-6 border-t border-gray-300">
+            <p className="heading-medium mb-1">
               {budget.remainingToday.toFixed(2)} €
             </p>
-            <p className="text-gray-600 text-sm uppercase tracking-wide">
+            <p className="body-text-muted">
               noch verfügbar
             </p>
           </div>
@@ -196,12 +196,12 @@ export default function Dashboard() {
 
       {/* Warnings */}
       {isCritical && (
-        <div className="card border-l-4 border-danger-DEFAULT bg-danger-light border-gray-200">
+        <div className="card border-l-2 border-danger-DEFAULT">
           <div className="flex items-start space-x-3">
-            <AlertTriangle className="h-6 w-6 text-danger-DEFAULT flex-shrink-0 mt-0.5" />
+            <AlertTriangle className="h-5 w-5 text-danger-DEFAULT flex-shrink-0 mt-0.5" />
             <div>
-              <h3 className="font-semibold text-white uppercase tracking-wide">Kritisches Budget-Limit erreicht!</h3>
-              <p className="text-sm text-gray-600 mt-1">
+              <h3 className="heading-small mb-1">Kritisches Budget-Limit erreicht!</h3>
+              <p className="body-text-muted">
                 Du hast bereits {budgetPercentage.toFixed(0)}% deines 3-Tage-Budgets verbraucht.
                 Weitere Ausgaben werden blockiert.
               </p>
@@ -211,12 +211,12 @@ export default function Dashboard() {
       )}
 
       {isWarning && !isCritical && (
-        <div className="card border-l-4 border-warning-DEFAULT bg-warning-light border-gray-200">
+        <div className="card border-l-2 border-warning-DEFAULT">
           <div className="flex items-start space-x-3">
-            <AlertTriangle className="h-6 w-6 text-warning-DEFAULT flex-shrink-0 mt-0.5" />
+            <AlertTriangle className="h-5 w-5 text-warning-DEFAULT flex-shrink-0 mt-0.5" />
             <div>
-              <h3 className="font-semibold text-white uppercase tracking-wide">Budget-Warnung</h3>
-              <p className="text-sm text-gray-600 mt-1">
+              <h3 className="heading-small mb-1">Budget-Warnung</h3>
+              <p className="body-text-muted">
                 Du näherst dich deinem 3-Tage-Limit. Sei vorsichtig mit weiteren Ausgaben.
               </p>
             </div>
@@ -226,15 +226,15 @@ export default function Dashboard() {
 
       {/* Simplified Stats */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="card border-gray-200">
+        <div className="card">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-sm font-medium text-gray-600 uppercase tracking-wide">Fixkosten (automatisch berechnet)</h3>
-            <TrendingDown className="h-5 w-5 text-danger-DEFAULT" />
+            <p className="label-text">Fixkosten (automatisch berechnet)</p>
+            <TrendingDown className="h-4 w-4 text-danger-DEFAULT" />
           </div>
-          <p className="text-2xl font-bold text-white">
+          <p className="heading-medium mb-1">
             {calculation.upcomingDeductions.toFixed(2)} €
           </p>
-          <p className="text-sm text-gray-600 mt-1 uppercase tracking-wide">
+          <p className="body-text-muted">
             Automatisch erkannt
           </p>
           {calculation.fixedCostInsights && calculation.fixedCostInsights.length > 0 && (
@@ -259,23 +259,23 @@ export default function Dashboard() {
           )}
         </div>
 
-        <div className="card border-gray-200">
+        <div className="card">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-sm font-medium text-gray-600 uppercase tracking-wide">Sparziel</h3>
-            <Zap className="h-5 w-5 text-white" />
+            <p className="label-text">Sparziel</p>
+            <Zap className="h-4 w-4 text-white" />
           </div>
-          <p className="text-2xl font-bold text-white">
+          <p className="heading-medium mb-1">
             {calculation.savingsAllocation.toFixed(2)} €
           </p>
-          <p className="text-sm text-gray-600 mt-1 uppercase tracking-wide">
+          <p className="body-text-muted">
             Diesen Monat
           </p>
         </div>
       </div>
 
       {/* Recent Transactions */}
-      <div className="card border-gray-200">
-        <h2 className="text-lg font-semibold mb-4 text-white uppercase tracking-wide">Letzte Transaktionen</h2>
+      <div className="card">
+        <h2 className="heading-small mb-4">Letzte Transaktionen</h2>
         <div className="space-y-3">
           {recentTransactions.length === 0 ? (
             <p className="text-gray-600 text-center py-4">Noch keine Transaktionen</p>
@@ -283,17 +283,17 @@ export default function Dashboard() {
             recentTransactions.map((transaction) => (
               <div
                 key={transaction.id}
-                className="flex items-center justify-between p-3 bg-gray-100 rounded-xl border border-gray-200"
+                className="flex items-center justify-between p-3 bg-gray-200 rounded-xl"
               >
                 <div className="flex-1">
-                  <p className="font-medium text-white">{transaction.description}</p>
-                  <p className="text-sm text-gray-600">
+                  <p className="body-text font-medium">{transaction.description}</p>
+                  <p className="body-text-muted">
                     {new Date(transaction.date).toLocaleDateString('de-DE')} • {transaction.category}
                   </p>
                 </div>
                 <div className="text-right">
                   <p
-                    className={`font-semibold ${
+                    className={`body-text font-semibold ${
                       transaction.type === 'income' ? 'text-success-DEFAULT' : 'text-danger-DEFAULT'
                     }`}
                   >
@@ -301,7 +301,7 @@ export default function Dashboard() {
                     {transaction.amount.toFixed(2)} €
                   </p>
                   {transaction.blocked && (
-                    <p className="text-xs text-danger-DEFAULT font-medium uppercase tracking-wide">Blockiert</p>
+                    <p className="label-text text-danger-DEFAULT">Blockiert</p>
                   )}
                 </div>
               </div>
@@ -312,13 +312,13 @@ export default function Dashboard() {
 
       {/* Recommendations */}
       {calculation.recommendations.length > 0 && (
-        <div className="card border-gray-200 gradient-iridescent">
-          <h2 className="text-lg font-semibold mb-4 text-white uppercase tracking-wide">
+        <div className="card gradient-iridescent">
+          <h2 className="heading-small mb-4">
             Empfehlungen
           </h2>
           <ul className="space-y-2">
             {calculation.recommendations.map((rec, index) => (
-              <li key={index} className="flex items-start space-x-2 text-white">
+              <li key={index} className="flex items-start space-x-2 body-text">
                 <span className="text-white mt-1">•</span>
                 <span>{rec}</span>
               </li>
